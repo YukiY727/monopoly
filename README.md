@@ -6,10 +6,9 @@
 Land
 
 Building(Land)
-
+担当
 
 Train(Land)
-
 Waterworks(Land)
 
 Electric(Land)
