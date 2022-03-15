@@ -59,7 +59,7 @@ class Land:
         while True:
             sys.stdout.write(f'{self.name} is now for sale. Please include your user name and  the amount you can offer')
             username = input('Enter your name: ')
-            while username in board.members_name:
+            while username not in board.members_name:
                 print('Please enter the correct username')
 
 
