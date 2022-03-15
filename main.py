@@ -5,7 +5,18 @@ import sys
 
 
 def query_yes_no(question, default="yes"):
-    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
+    """質問(yes/no)の回答をBool値で出力
+
+    Args:
+        question (str): 標準出力する質問文
+        default (str, optional): 回答のデフォルト. Defaults to "yes".
+
+    Raises:
+        ValueError: 変数defaultにNone, "yes", "no"以外の値が入ったときのエラー
+
+    Returns:
+        bool: 質問への回答yes/noをTrue/Falseとして返す
+    """
     if default is None:
         prompt = " [y/n] "
     elif default == "yes":
@@ -18,10 +29,10 @@ def query_yes_no(question, default="yes"):
     while True:
         sys.stdout.write(question + prompt)
         choice = input().lower()
-        if default is not None and choice == "":
-            return valid[default]
-        elif choice in valid:
-            return valid[choice]
+        if "yes".startswith(choice):
+            return True
+        elif "no".startswith(choice):
+            return False
         else:
             sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
