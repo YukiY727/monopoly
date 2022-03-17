@@ -65,7 +65,25 @@ class Land:
                 print('Please enter the correct username')
                 username = input('Enter your name: ')
             # 競売
-            money = input('Enter the amount you can offer')
+            max_money = 0
+            while True:
+                plyer_money = input('Enter the amount you can offer')
+                if plyer_money > max_money:
+                    max_money = plyer_money
+                    buyer = plyer.name
+                    print(f'{plyer.name}:{max_money}')
+                else:
+                    print(f'Enter more money than {max_money}')
+                    answer = query_yes_no(f'Would you like to buy this land for more money than {max_money}?')
+                    if answer:
+                        continue
+                    else:
+                        break
+            
+
+                    
+            
+            
 
 class Player:
     def __init__(self, name: str):
