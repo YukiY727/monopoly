@@ -11,7 +11,10 @@ Building(Land)
 
 Train(Land)
 
-Waterworks(Land)
+publiccompany(Land)
 
-Electric(Land)
->>>>>>> f2d40b276df6bb901cce2ff1cc201e475d362658
+
+### 参考
+https://www.esquire.com/jp/lifestyle/a190344/lifestyle-news-monopoly17-1201/
+
+https://ja.wikipedia.org/wiki/%E3%83%A2%E3%83%8E%E3%83%9D%E3%83%AA%E3%83%BC

@@ -1,7 +1,9 @@
 # %%
 from __future__ import annotations
+from calendar import c
 
 import sys
+from random import random
 
 
 def query_yes_no(question, default="yes"):
@@ -50,8 +52,11 @@ class Land:
         if answer:
             plyer.land.append()
             plyer.money -= self.price
+            self.is_own = True
+            self.owner = plyer
         else:
             self.auction()
+
     def auction(self, board: Board):
         while True:
             sys.stdout.write(f'{self.name} is now for sale. Please include your user name and  the amount you can offer')
@@ -59,8 +64,8 @@ class Land:
             while username not in board.members_name:
                 print('Please enter the correct username')
                 username = input('Enter your name: ')
-            #競売のコード
-
+            # 競売
+            money = input('Enter the amount you can offer')
 
 class Player:
     def __init__(self, name: str):
@@ -76,16 +81,41 @@ class Player:
 # class Train:
 #     def __init__(self):
 
-class publiccompany:
+class Waterworks:  # class Electric で別に作る
     def __init__(self, name: str, price: int):
         self.name = name
         self.price = price
         self.is_own = False
         self.owner = None
-    # class Land を入れる(売買と競売について)(ownerとis_ownの記述を書く)
+
+    def be_bought(self, plyer: Player ):
+        answer = query_yes_no(f'Would you buy this company for {self.price} ?')
+        if answer:
+            plyer.land.append()
+            plyer.money -= self.price
+            self.is_own = True
+            self.owner = plyer
+        else:
+            self.auction()
+
+    def auction(self, board: Board):
+        while True:
+            sys.stdout.write(f'{self.name} is now for sale. Please include your user name and  the amount you can offer')
+            username = input('Enter your name: ')
+            while username not in board.members_name:
+                print('Please enter the correct username')
+                username = input('Enter your name: ')
+            # 競売
+
     def rental(self, plyer: Player ):
-        if self.is_own == False and self.owner != None:
-            rental_cost = # 所有数による場合分け、チャンスカードできた場合の場合分け
+        if self.name not in plyer.land:
+            if chance:
+                rental_cost = random.randint(1, 6) * 10
+            else:
+                if 'Electric' in self.owner.land:
+                    rental_cost = random.randint(1, 6) * 10
+                else:
+                    rental_cost = random.randint(1, 6) * 5
             plyer.money -= rental_cost
             self.owner.money += rental_cost
 
