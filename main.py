@@ -49,17 +49,19 @@ class Board:
 
 class Land:
 
-    def __init__(self, name: str, price: int):
+    def __init__(self, name: str, price: int, rental_price: int):
         self.name = name
         self.price = price
         self.is_own = False
         self.owner = None
         self.is_mortgage = False
+        self.rental_price = rental_price
 
     def be_bought(self, plyer: Player, board: Board):
-        answer = query_yes_no(f'Would you buy this land for {self.price} ?<>')
+        answer = query_yes_no(f'Would you buy this land for {self.price} ?')
         if answer:
-            plyer.land.append()
+            plyer.land.append(self)
+            self.owner = plyer
             plyer.money -= self.price
         else:
             self.auction(board)
@@ -96,6 +98,7 @@ class Land:
                 print(
                     f'{self.name} is bought by {self.owner.name} for {auction_price}!'
                 )
+                self.owner.land.append(self)
                 self.is_own = True
                 self.owner.money -= auction_price
                 break
@@ -104,6 +107,10 @@ class Land:
         self.is_own = True
         self.owner.money -= round(self.price / 2 * 1.1)
         
+
+    def charge_rental(self, user: Player):
+        user.money -= self.rental_price
+        self.owner.money += self.rental_price
 
 
 class Player:
@@ -137,6 +144,8 @@ class Player:
 yusaku = Player('yusaku')
 takeshun = Player('takeshun')
 board = Board([yusaku, takeshun])
-land = Land('test', 200)
+land = Land('test', 200, 50)
 #%%
 land.be_bought(yusaku, board)
+land.charge_rental(takeshun)
+# %%
