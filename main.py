@@ -56,6 +56,7 @@ class Land:
         self.owner = None
         self.is_mortgage = False
         self.rental_price = rental_price
+        self.is_mortgage = False
 
     def be_bought(self, plyer: Player, board: Board):
         answer = query_yes_no(f'Would you buy this land for {self.price} ?')
@@ -107,6 +108,11 @@ class Land:
         self.is_own = True
         self.owner.money -= round(self.price / 2 * 1.1)
         
+
+    def put_in_mortgage(self):
+        self.owner.money += self.price / 2
+        self.is_own = False
+        self.is_mortgage = True
 
     def charge_rental(self, user: Player):
         user.money -= self.rental_price
