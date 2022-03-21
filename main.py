@@ -54,6 +54,7 @@ class Land:
         self.price = price
         self.is_own = False
         self.owner = None
+        self.is_mortgage = False
         self.rental_price = rental_price
         self.is_mortgage = False
 
@@ -102,6 +103,11 @@ class Land:
                 self.is_own = True
                 self.owner.money -= auction_price
                 break
+    def cancel_mortgage(self):
+        self.is_mortgage = False
+        self.is_own = True
+        self.owner.money -= round(self.price / 2 * 1.1)
+        
 
     def put_in_mortgage(self):
         self.owner.money += self.price / 2
