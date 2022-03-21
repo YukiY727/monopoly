@@ -1,8 +1,6 @@
 # %%
 from __future__ import annotations
 
-import sys
-
 
 def query_yes_no(question, default="yes"):
     """質問(yes/no)の回答をBool値で出力
@@ -27,15 +25,15 @@ def query_yes_no(question, default="yes"):
         raise ValueError("invalid default answer: '%s'" % default)
 
     while True:
-        sys.stdout.write(question + prompt)
+        print(question + prompt)
         choice = input().lower()
         if "yes".startswith(choice):
             return True
         elif "no".startswith(choice):
             return False
         else:
-            sys.stdout.write("Please respond with 'yes' or 'no' "
-                             "(or 'y' or 'n').\n")
+            print("Please respond with 'yes' or 'no' "
+                  "(or 'y' or 'n').\n")
 
 
 class Board:
@@ -58,7 +56,7 @@ class Land:
         self.owner = None
 
     def be_bought(self, plyer: Player, board: Board):
-        answer = query_yes_no(f'Would you buy this land for {self.price} ?')
+        answer = query_yes_no(f'Would you buy this land for {self.price} ?<>')
         if answer:
             plyer.land.append()
             plyer.money -= self.price
@@ -68,13 +66,13 @@ class Land:
     def auction(self, board: Board):
         auction_price = None
         while True:
-            sys.stdout.write(
+            print(
                 f'{self.name} is now for sale. Please include your user name and the amount you can offer\n'
             )
             username = input('Enter your name: ')
             # TODO:usernameを間違えると'Please enter...が出続ける点の修正'
             while username not in board.members_name:
-                print('Please enter the correct username')
+                username = input('Please enter the correct username')
             user = board.name_member_mapping[username]
             offered_price = int(input("Enter a price you can offer: "))
             if auction_price:
@@ -82,20 +80,19 @@ class Land:
                     auction_price = offered_price
                     self.owner = user
                 else:
-                    sys.stdout.write(
+                    print(
                         'offered price is not higher than the amount offered before\n'
                     )
             else:
                 auction_price = offered_price
                 self.owner = user
-            sys.stdout.write(
+            print(
                 f'{self.name}\'s price is {auction_price} now (offered by {self.owner.name})\n'
             )
-            sys.stdout.write(
+            continue_auction = query_yes_no(
                 f'Is there anyone who buys {self.name} at a higher price?\n')
-            continue_auction = yes_no_input()
             if not continue_auction:
-                sys.stdout.write(
+                print(
                     f'{self.name} is bought by {self.owner.name} for {auction_price}!'
                 )
                 self.is_own = True
@@ -126,21 +123,9 @@ class Player:
 # class Chance:
 #     def __init__(self):
 
-
 # class Pool:
 #     def __init__(self):
-# %%
-def yes_no_input():
-    while True:
-        choice = input("Please respond with 'yes' or 'no' [y/N]: ").lower()
-        if choice in ['y', 'ye', 'yes']:
-            return True
-        elif choice in ['n', 'no']:
-            return False
 
-
-# %%
-query_yes_no('ok')
 # %%
 # test
 yusaku = Player('yusaku')
@@ -149,3 +134,4 @@ board = Board([yusaku, takeshun])
 land = Land('test', 200)
 #%%
 land.be_bought(yusaku, board)
+# %%
