@@ -1,0 +1,24 @@
+{
+    // ファイルについて
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 800,
+    // エディタについて
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      // isort formatter
+      "source.organizeImports": true
+    },
+    "files.eol": "\n",
+    // yapf formatter
+    "python.formatting.provider": "yapf",
+    "python.formatting.yapfArgs": [
+      "--style={column_limit: 84, indent_width: 4, SPLIT_BEFORE_NAMED_ASSIGNS=False}"
+    ],
+    // flake8 linter
+    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Args": [
+      "--max-line-length=84"
+    ],
+    "python.linting.flake8CategorySeverity.F": "Warning",
+    "python.linting.flake8CategorySeverity.E": "Warning",
+  }
