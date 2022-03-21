@@ -54,6 +54,7 @@ class Land:
         self.price = price
         self.is_own = False
         self.owner = None
+        self.is_mortgage = False
 
     def be_bought(self, plyer: Player, board: Board):
         answer = query_yes_no(f'Would you buy this land for {self.price} ?<>')
@@ -98,6 +99,11 @@ class Land:
                 self.is_own = True
                 self.owner.money -= auction_price
                 break
+    def cancel_mortgage(self):
+        self.is_mortgage = False
+        self.is_own = True
+        self.owner.money -= round(self.price / 2 * 1.1)
+        
 
 
 class Player:
@@ -134,4 +140,3 @@ board = Board([yusaku, takeshun])
 land = Land('test', 200)
 #%%
 land.be_bought(yusaku, board)
-# %%
