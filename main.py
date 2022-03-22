@@ -103,11 +103,11 @@ class Land:
                 self.is_own = True
                 self.owner.money -= auction_price
                 break
+
     def cancel_mortgage(self):
         self.is_mortgage = False
         self.is_own = True
         self.owner.money -= round(self.price / 2 * 1.1)
-        
 
     def put_in_mortgage(self):
         self.owner.money += self.price / 2
@@ -127,8 +127,46 @@ class Player:
         self.money = 1500
 
 
-# class Building:
-#     def __init__(self):
+class Building(Land):
+    def __init__(self):
+        self.total_buildings = 0
+        self.buildings_per_lands = 0
+
+
+class Brown(Building):
+    NUM_OF_LANDS = 2
+    NUM_TO_RENT = {
+        0: 4,
+        1: 20,
+        2: 60,
+        3: 180,
+        4: 320,
+    }
+    HOTEL = 450
+
+    def __init__(self):
+        super().__init__()
+    
+    # TODO:ホテルが立つときの挙動を実装
+    def add_building(self):
+        self.total_buildings += 1
+        if self.total_buildings % self.NUM_OF_LANDS == 0:
+            self.buildings_per_lands += 1
+        print('A building is constracted!')
+
+    def show_rent(self):
+
+        buildings_per_land = int(self.total_buildings // self.NUM_OF_LANDS)
+        if buildings_per_land in self.NUM_TO_RENT.keys():
+            print(f'{self.NUM_TO_RENT[buildings_per_land]}$')
+        else:
+            print(f'{self.HOTEL}$')
+
+
+brown = Brown()
+brown.add_building()
+brown.add_building()
+brown.show_rent()
 
 # class Train:
 #     def __init__(self):
@@ -145,13 +183,11 @@ class Player:
 # class Pool:
 #     def __init__(self):
 
-# %%
 # test
-yusaku = Player('yusaku')
-takeshun = Player('takeshun')
-board = Board([yusaku, takeshun])
-land = Land('test', 200, 50)
-#%%
-land.be_bought(yusaku, board)
-land.charge_rental(takeshun)
-# %%
+# yusaku = Player('yusaku')
+# takeshun = Player('takeshun')
+# board = Board([yusaku, takeshun])
+# land = Land('test', 200, 50)
+# #%%
+# land.be_bought(yusaku, board)
+# land.charge_rental(takeshun)
