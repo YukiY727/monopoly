@@ -103,11 +103,11 @@ class Land:
                 self.is_own = True
                 self.owner.money -= auction_price
                 break
+
     def cancel_mortgage(self):
         self.is_mortgage = False
         self.is_own = True
         self.owner.money -= round(self.price / 2 * 1.1)
-        
 
     def put_in_mortgage(self):
         self.owner.money += self.price / 2
@@ -124,14 +124,27 @@ class Player:
     def __init__(self, name: str):
         self.name = name
         self.land = []
-        self.money = 1500
+        self.train: list[Train] = []
+        self.money: int = 1500
 
 
 # class Building:
 #     def __init__(self):
 
-# class Train:
-#     def __init__(self):
+
+class Train(Land):
+
+    def __init__(name: str, price: int, rental_price: int):
+        super().__init__(name, price, rental_price)
+
+    def be_bought(self, plyer: Player, board: Board):
+        super().be_bought(plyer, board)
+        for owner_train in self.owner.train:
+            owner_train.change_rental(self.owner)
+
+    def change_rental(self, owner: Player):
+        self.rental_price = 50 * len(self.owner.train)
+
 
 # class Waterworks:
 #     def __init__(self):
