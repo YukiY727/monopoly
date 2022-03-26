@@ -154,12 +154,24 @@ class Public(Land):
     def be_bought(self, plyer: Player, board: Board):
         super().be_bought(plyer, board)
 
+    def auction(self, board: Board):
+        super().be_bought(board)
+
+    def cancel_mortgage(self):
+        self.is_mortgage = False
+        self.is_own = True
+        self.owner.money -= round(self.price / 2 * 1.1)
+        
+    def put_in_mortgage(self):
+        self.owner.money += 75
+        self.is_own = False
+        self.is_mortgage = True
+
     def pay_rental(self, user: Player):
         dice = int(input())
         #if chance:
         #    self.rental_price = dice * 10
         #else:
-
         if len(self.owner.public_business) == 2:  # ElectricとWaterworksの所有者が同じ  
             self.rental_price = dice * 10
         elif len(self.owner.public_business) == 1: # どちらか一つ所有
@@ -172,6 +184,9 @@ class Public(Land):
 
 # class Pool:
 #     def __init__(self):
+
+# class jail:
+
 
 
 # test
