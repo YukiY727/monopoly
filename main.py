@@ -50,19 +50,25 @@ class Board:
 
 class Land:
 
-    def __init__(self, name: str, price: int, rental_price: int):
+    def __init__(self, name: str, price: int, rental_price: int, kind: str):
         self.name = name
         self.price = price
         self.is_own = False
         self.owner = None
         self.is_mortgage = False
         self.rental_price = rental_price
+        self.kind = kind
 
 
     def be_bought(self, plyer: Player, board: Board):
         answer = query_yes_no(f'Would you buy this land for {self.price} ?')
         if answer:
-            plyer.land.append(self)
+            if self.kind == 'building':
+                plyer.buildings.append(self)
+            elif self.kind == 'train':
+                plyer.train.append(self)
+            elif self.kind == 'public_business':
+                plyer.public_business.append(self)
             self.owner = plyer
             plyer.money -= self.price
         else:
@@ -94,13 +100,17 @@ class Land:
             print(
                 f'{self.name}\'s price is {auction_price} now (offered by {self.owner.name})\n'
             )
-            continue_auction = query_yes_no(
-                f'Is there anyone who buys {self.name} at a higher price?\n')
+            continue_auction = query_yes_no(f'Is there anyone who buys {self.name} at a higher price?\n')
             if not continue_auction:
                 print(
                     f'{self.name} is bought by {self.owner.name} for {auction_price}!'
                 )
-                self.owner.land.append(self)
+                if self.kind == 'building':
+                    self.owner.buildings.append(self)
+                elif self.kind == 'train':
+                    self.owner.train.append(self)
+                elif self.kind == 'public_business':
+                    self.owner.public_business.append(self)
                 self.is_own = True
                 self.owner.money -= auction_price
                 break
@@ -124,11 +134,13 @@ class Player:
 
     def __init__(self, name: str):
         self.name = name
-        self.land = []
-        self.money = 1500
+        self.train: list[Train] = []
+        self.buildings: list[Buildings] = []
+        self.public_business: list[Public] = []
+        self.money: int = 1500
 
 
-# class Building:
+# class Buildings:
 #     def __init__(self):
 
 # class Train:
@@ -136,77 +148,20 @@ class Player:
 
 class Public:
 
-    def __init__(self, name: str, price: int):
-        self.name = name
-        self.price = price
-        self.is_own = False
-        self.owner = None
-        self.is_mortgage = False
+    def __init__(self, name: str, price: int, rental_price: int, kind: str):
+        super().__init__(name, price, rental_price, kind)
 
     def be_bought(self, plyer: Player, board: Board):
-        answer = query_yes_no(f'Would you buy Company for {self.price} ?')
-        if answer:
-            plyer.land.append(self)
-            self.owner = plyer
-            plyer.money -= self.price
-        else:
-            self.auction(board)
+        super().be_bought(plyer, board)
 
-    def auction(self, board: Board):
-        auction_price = None
-        while True:
-            print(
-                f'{self.name} is now for sale. Please include your user name and the amount you can offer\n'
-            )
-            username = input('Enter your name: ')
-            # TODO:usernameを間違えると'Please enter...が出続ける点の修正'
-            while username not in board.members_name:
-                username = input('Please enter the correct username')
-            user = board.name_member_mapping[username]
-            offered_price = int(input("Enter a price you can offer: "))
-            if auction_price:
-                if offered_price > auction_price:
-                    auction_price = offered_price
-                    self.owner = user
-                else:
-                    print(
-                        'offered price is not higher than the amount offered before\n'
-                    )
-            else:
-                auction_price = offered_price
-                self.owner = user
-            print(
-                f'{self.name}\'s price is {auction_price} now (offered by {self.owner.name})\n'
-            )
-            continue_auction = query_yes_no(
-                f'Is there anyone who buys {self.name} at a higher price?\n')
-            if not continue_auction:
-                print(
-                    f'{self.name} is bought by {self.owner.name} for {auction_price}!'
-                )
-                self.owner.land.append(self)
-                self.is_own = True
-                self.owner.money -= auction_price
-                break
-
-    def cancel_mortgage(self):
-        self.is_mortgage = False
-        self.is_own = True
-        self.owner.money -= round(self.price / 2 * 1.1)
-        
-    def put_in_mortgage(self):
-        self.owner.money += self.price / 2
-        self.is_own = False
-        self.is_mortgage = True
-
-    def charge_rental(self, user: Player):
+    def pay_rental(self, user: Player):
         dice = int(input())
         if chance:
             self.rental_price = dice * 10
         else:
-            if self.owner == Electric.owner:  # ElectricとWaterworksの所有者が同じ  
+            if len(self.owner.public_business) == 2:  # ElectricとWaterworksの所有者が同じ  
                 self.rental_price = dice * 10
-            else:
+            elif len(self.owner.public_business) == 1: # どちらか一つ所有
                 self.rental_price = dice * 4
         user.money -= self.rental_price
         self.owner.money += self.rental_price
