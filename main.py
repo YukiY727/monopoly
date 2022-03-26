@@ -53,12 +53,13 @@ class Go:
     def __init__(self):
         self.name = 'Go'
 
-    def stop(self)
+    def stop(self):
+        pass
 
 
 class Land:
 
-    def __init__(self, name: str, price: int, rental_price: int):
+    def __init__(self, name: str, price: int, rental_price: int, kind: str):
         self.name = name
         self.price = price
         self.is_own = False
@@ -66,6 +67,7 @@ class Land:
         self.is_mortgage = False
         self.rental_price = rental_price
         self.is_mortgage = False
+        self.kind = kind
 
     def __call__(self, player: Player, board: Board):
         if self.owner:
@@ -76,7 +78,12 @@ class Land:
     def be_bought(self, player: Player, board: Board):
         answer = query_yes_no(f'Would you buy this land for {self.price} ?')
         if answer:
-            player.land.append(self)
+            if self.kind == 'building':
+                player.buildings.append(self)
+            elif self.kind == 'train':
+                player.train.append(self)
+            elif self.kind == 'public_business':
+                player.train.append(self)
             self.owner = player
             player.money -= self.price
         else:
@@ -114,15 +121,20 @@ class Land:
                 print(
                     f'{self.name} is bought by {self.owner.name} for {auction_price}!'
                 )
-                self.owner.land.append(self)
+                if self.kind == 'building':
+                    self.owner.buildings.append(self)
+                elif self.kind == 'train':
+                    self.owner.train.append(self)
+                elif self.kind == 'public_business':
+                    self.owner.public_business.append(self)
                 self.is_own = True
                 self.owner.money -= auction_price
                 break
+
     def cancel_mortgage(self):
         self.is_mortgage = False
         self.is_own = True
         self.owner.money -= round(self.price / 2 * 1.1)
-        
 
     def put_in_mortgage(self):
         self.owner.money += self.price / 2
@@ -138,15 +150,30 @@ class Player:
 
     def __init__(self, name: str):
         self.name = name
-        self.land = []
-        self.money = 1500
+        self.train: list[Train] = []
+        self.buildings: list[Buildings] = []
+        self.train: list[Train] = []
+        self.public_business: list[Public] = []
+        self.money: int = 1500
 
 
 # class Building:
 #     def __init__(self):
 
-# class Train:
-#     def __init__(self):
+
+class Train(Land):
+
+    def __init__(self, name: str, kind: str):
+        super().__init__(name, 200, 50, kind)
+
+    def be_bought(self, player: Player, board: Board):
+        super().be_bought(player, board)
+        for owner_train in self.owner.train:
+            owner_train.change_rental()
+
+    def change_rental(self):
+        self.rental_price = 50 * len(self.owner.train)
+
 
 # class Waterworks:
 #     def __init__(self):
@@ -165,8 +192,13 @@ class Player:
 yusaku = Player('yusaku')
 takeshun = Player('takeshun')
 board = Board([yusaku, takeshun])
-land = Land('test', 200, 50)
+# land = Land('test', 200, 50)
+train1 = Train('train1', 'train')
+train2 = Train('train2','train')
 #%%
-land(yusaku, board)
-land(takeshun, board)
+# land(yusaku, board)
+# land(takeshun, board)
+train1(yusaku, board)
+train2(yusaku, board)
+train1(takeshun, board)
 # %%
