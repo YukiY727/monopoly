@@ -158,7 +158,6 @@ class Street(Land):
         else:
             self.num_houses = 0
             self.num_hotels += 1
-        
 
     def show_state(self):
         print(f'houses: {self.num_houses}')
@@ -170,6 +169,20 @@ class Color():
     def __init__(self, streets: Iterable[Street]):
         self.streets = streets
         self.color = None
+
+    def can_buy_building(self, street_name: str):
+        street_names = [street.name for street in self.streets]
+        if not street_name in street_names:
+            raise ValueError('不正なstreet名')
+        owners = set(street.owner for street in self.streets)
+        monopolied = len(owners) == 1 and not None in owners
+        # その土地とほかの土地の建物数の差が1以下なら購入可能
+        num_houses = [street.num_houses for street in self.streets]
+        num_hotels = [street.num_hotels for street in self.streets]
+        is_valid_nums = max(num_houses) - min(num_houses) <= 1 and max(
+            num_hotels) - min(num_hotels) <= 1
+        can_buy = monopolied and is_valid_nums
+        return can_buy
 
 
 
