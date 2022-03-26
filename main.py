@@ -45,7 +45,48 @@ class Board:
             name: player
             for name, player in zip(self.members_name, self.members)
         }
-        self.cell = ()
+        self.cell = (
+            Go,
+            Street(),
+            Pool(),
+            Street(),
+            Incometax(),
+            Train(),
+            Street(),
+            Chance(),
+            Street(),
+            Street(),
+            Jail(),
+            Street(),
+            Public(),
+            Street(),
+            Street(),
+            Train(),
+            Street(),
+            Pool(),
+            Street(),
+            Street(),
+            Park(),
+            Street(),
+            Chance(),
+            Street(),
+            Street(),
+            Train(),
+            Street(),
+            Street(),
+            Public(),
+            Street(),
+            Gojail(),
+            Street(),
+            Street(),
+            Pool(),
+            Street(),
+            Train(),
+            Chance(),
+            Street(),
+            Luxurytax(),
+            Street(),
+        )
 
 
 class Go:
@@ -53,9 +94,21 @@ class Go:
     def __init__(self):
         self.name = 'Go'
 
-    def stop(self):
-        pass
+    def __call__(self, player: Player, board: Board):
+        player.money += 200
 
+class Incometax:
+    def __init__(self):
+        self.name = 'Income tax'
+
+    def __call__(self, player: Player, board: Board):
+        player.money -= 200
+class Luxurytax:
+    def __init__(self):
+        self.name = 'Luxury tax'
+
+    def __call__(self, player: Player, board: Board):
+        player.money -= 100
 
 class Land:
 
@@ -157,8 +210,10 @@ class Player:
         self.money: int = 1500
 
 
-# class Building:
-#     def __init__(self):
+class Street:
+
+    def __init__(self):
+        pass
 
 
 class Train(Land):
@@ -175,17 +230,23 @@ class Train(Land):
         self.rental_price = 50 * len(self.owner.train)
 
 
-# class Waterworks:
-#     def __init__(self):
+class Public:
 
-# class Electric:
-#     def __init__(self):
+    def __init__(self):
+        pass
 
-# class Chance:
-#     def __init__(self):
 
-# class Pool:
-#     def __init__(self):
+class Chance:
+
+    def __init__(self):
+        pass
+
+
+class Pool:
+
+    def __init__(self):
+        pass
+
 
 # %%
 # test
@@ -194,7 +255,7 @@ takeshun = Player('takeshun')
 board = Board([yusaku, takeshun])
 # land = Land('test', 200, 50)
 train1 = Train('train1', 'train')
-train2 = Train('train2','train')
+train2 = Train('train2', 'train')
 #%%
 # land(yusaku, board)
 # land(takeshun, board)
