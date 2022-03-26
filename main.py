@@ -1,7 +1,7 @@
 # %%
 from __future__ import annotations
 
-from typing import Iterable
+from typing import Dict, Iterable
 
 
 def query_yes_no(question, default="yes"):
@@ -128,14 +128,36 @@ class Player:
         self.land = []
         self.money = 1500
 
+    def giveup_or_continue(self):
+        if self.land:
+            put_in_mortgage = query_yes_no('Would you put your land to mortgage?')
+            if put_in_mortgage:
+                pass
+                # TODO:continueする処理
+        else:
+            pass
+            # TODO:やめる処理の追加
+
 
 class Street(Land):
 
-    def __init__(self, color: str, name: str, price: int, rental_price: int):
-        super().__init__(name, price, rental_price)
+    def __init__(self, color: str, name: str, price: int,
+                 rental_price_house: Iterable(int), rental_price_hotel: int):
+        """
+        color: 通りのカードの色
+        name: 通りの名前
+        price: 通りの値段
+        rental_price_house: 家の個数に対する通行料
+        rental_price_hotel: ホテルの個数に対する通行料
+        """
+        super().__init__(name, price)
         self.num_houses = 0
         self.num_hotels = 0
         self.color = color
+        self.rental_price = {
+            'house': rental_price_house,
+            'hotel': rental_price_hotel
+        }
 
     def add_building(self):
         if self.num_houses <= 4:
@@ -144,6 +166,14 @@ class Street(Land):
         else:
             self.num_houses = 0
             self.num_hotels += 1
+
+    def charge_rental(self, player: Player):
+        if self.num_hotels:
+            rental_price = self.rental_price['hotel']
+        else:
+            rental_price = self.rental_price['house']
+        player.money -= rental_price
+        print(f'charged {rental_price} to {player.name}!')
 
     def show_state(self):
         print(f'houses: {self.num_houses}')
@@ -171,6 +201,12 @@ class Color():
         return can_buy
 
 
+class Brown(Color):
+
+    def __init__(self, streets: Iterable[Street]):
+        super().__init__()
+
+
 # class Train:
 #     def __init__(self):
 
@@ -190,9 +226,19 @@ class Color():
 yusaku = Player('yusaku')
 takeshun = Player('takeshun')
 board = Board([yusaku, takeshun])
-street = Street('red', 'test', 200, 50)
-street.owner = yusaku
-street.add_building()
-street.show_state()
+street1 = Street('red', 'test1', 200, 50)
+street2 = Street('red', 'test2', 100, 25)
+
+street1.owner = yusaku
+street2.owner = takeshun
+color = Color([street1, street2])
+if color.can_buy_building('test1'):
+    print('can_buy')
+else:
+    print('can\'t buy')
+street2.owner = yusaku
+if color.can_buy_building('test1'):
+    print('can_buy')
+
 # land.be_bought(yusaku, board)
 # land.charge_rental(takeshun)
