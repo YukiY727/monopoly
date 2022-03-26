@@ -1,6 +1,8 @@
 # %%
 from __future__ import annotations
 
+from typing import Optional
+
 
 def query_yes_no(question, default="yes"):
     """質問(yes/no)の回答をBool値で出力
@@ -59,17 +61,17 @@ class Land:
         self.is_mortgage = False
         self.kind = kind
 
-    def be_bought(self, plyer: Player, board: Board):
+    def be_bought(self, player: Player, board: Board):
         answer = query_yes_no(f'Would you buy this land for {self.price} ?')
         if answer:
             if self.kind == 'building':
-                plyer.buildings.append(self)
+                player.buildings.append(self)
             elif self.kind == 'train':
-                plyer.train.append(self)
+                player.train.append(self)
             elif self.kind == 'public_business':
-                plyer.train.append(self)
-            self.owner = plyer
-            plyer.money -= self.price
+                player.train.append(self)
+            self.owner = player
+            player.money -= self.price
         else:
             self.auction(board)
 
@@ -150,26 +152,50 @@ class Train(Land):
     def __init__(self, name: str, kind: str):
         super().__init__(name, 200, 50, kind)
 
-    def be_bought(self, plyer: Player, board: Board):
-        super().be_bought(plyer, board)
+    def be_bought(self, player: Player, board: Board):
+        super().be_bought(player, board)
         for owner_train in self.owner.train:
             owner_train.change_rental()
 
     def change_rental(self):
         self.rental_price = 50 * len(self.owner.train)
 
+class Chance:
+    def __init__(self, text: str, price_positive: Optional[int] = None, 
+    price_negative: Optional[int] = None, kind: str, house_repair: Optional[int]=None, 
+    hotel_repair: Optional[int]=None, back: Optional[int], go_street_num: Optional[int],
+    ):
+        self.kind = kind
+        self.text = text
+        if self.kind == 'go_money':
+            self.price_positive = price_positive
+            self.go_street_num = go_street_num
+        elif self.kind == 'negative_money':
+            self.price_negative = price_negative
+        elif self.kind == 'go_jail':
+            pass
+        elif self.kind == 'general_repairs':
+            self.house_repair = house_repair
+            self.hotel_repair = hotel_repair
+        elif self.kind == 'back':
+            self.back = back
+        elif self.kind == 'go_street':
+            self.go_street_num = go_street_num
+        elif self.kind == 'get_out_jail':
+            pass
+        elif self.kind == 'go_public_business':
+            pass
+        elif self.kind == 'go_train':
+            pass
+    
 
-# class Waterworks:
-#     def __init__(self):
+    def trigger(self, player: Player, board: Optional[Board]=None):
+        if self.kind == 'go_money':
+            board.
 
-# class Electric:
-#     def __init__(self):
 
-# class Chance:
-#     def __init__(self):
-
-# class Pool:
-#     def __init__(self):
+class Pool:
+    def __init__(self):
 
 # %%
 # test
