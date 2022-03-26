@@ -45,6 +45,15 @@ class Board:
             name: player
             for name, player in zip(self.members_name, self.members)
         }
+        self.cell = ()
+
+
+class Go:
+
+    def __init__(self):
+        self.name = 'Go'
+
+    def stop(self)
 
 
 class Land:
@@ -58,12 +67,18 @@ class Land:
         self.rental_price = rental_price
         self.is_mortgage = False
 
-    def be_bought(self, plyer: Player, board: Board):
+    def __call__(self, player: Player, board: Board):
+        if self.owner:
+            self.charge_rental(player)
+        else:
+            self.be_bought(player, board)
+
+    def be_bought(self, player: Player, board: Board):
         answer = query_yes_no(f'Would you buy this land for {self.price} ?')
         if answer:
-            plyer.land.append(self)
-            self.owner = plyer
-            plyer.money -= self.price
+            player.land.append(self)
+            self.owner = player
+            player.money -= self.price
         else:
             self.auction(board)
 
@@ -152,6 +167,6 @@ takeshun = Player('takeshun')
 board = Board([yusaku, takeshun])
 land = Land('test', 200, 50)
 #%%
-land.be_bought(yusaku, board)
-land.charge_rental(takeshun)
+land(yusaku, board)
+land(takeshun, board)
 # %%
