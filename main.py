@@ -146,23 +146,24 @@ class Player:
 # class Train:
 #     def __init__(self):
 
-class Public:
+class Public(Land):
 
-    def __init__(self, name: str, price: int, rental_price: int, kind: str):
-        super().__init__(name, price, rental_price, kind)
+    def __init__(self, name: str, price: int, kind: str):
+        super().__init__(name, price, 0, kind)
 
     def be_bought(self, plyer: Player, board: Board):
         super().be_bought(plyer, board)
 
     def pay_rental(self, user: Player):
         dice = int(input())
-        if chance:
+        #if chance:
+        #    self.rental_price = dice * 10
+        #else:
+
+        if len(self.owner.public_business) == 2:  # ElectricとWaterworksの所有者が同じ  
             self.rental_price = dice * 10
-        else:
-            if len(self.owner.public_business) == 2:  # ElectricとWaterworksの所有者が同じ  
-                self.rental_price = dice * 10
-            elif len(self.owner.public_business) == 1: # どちらか一つ所有
-                self.rental_price = dice * 4
+        elif len(self.owner.public_business) == 1: # どちらか一つ所有
+            self.rental_price = dice * 4
         user.money -= self.rental_price
         self.owner.money += self.rental_price
 
@@ -172,14 +173,16 @@ class Public:
 # class Pool:
 #     def __init__(self):
 
-# %%
+
 # test
 yusaku = Player('yusaku')
 takeshun = Player('takeshun')
 board = Board([yusaku, takeshun])
-land = Land('test', 200, 50)
-#%%
-land.be_bought(yusaku, board)
-land.charge_rental(takeshun)
-# %%
 
+water = Public('test1', 200, 'public_business')
+elect = Public('test2', 200, 'public_business')
+
+water.be_bought(yusaku, board)
+elect.be_bought(yusaku, board)
+
+water.pay_rental(takeshun)
