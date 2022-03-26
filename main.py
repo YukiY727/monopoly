@@ -1,6 +1,8 @@
 # %%
 from __future__ import annotations
 
+from typing import Iterable
+
 
 def query_yes_no(question, default="yes"):
     """質問(yes/no)の回答をBool値で出力
@@ -127,46 +129,34 @@ class Player:
         self.money = 1500
 
 
-class Building(Land):
-    def __init__(self):
-        self.total_buildings = 0
-        self.buildings_per_lands = 0
+class Street(Land):
 
+    def __init__(self, color: str, name: str, price: int, rental_price: int):
+        super().__init__(name, price, rental_price)
+        self.num_houses = 0
+        self.num_hotels = 0
+        self.color = color
 
-class Brown(Building):
-    NUM_OF_LANDS = 2
-    NUM_TO_RENT = {
-        0: 4,
-        1: 20,
-        2: 60,
-        3: 180,
-        4: 320,
-    }
-    HOTEL = 450
-
-    def __init__(self):
-        super().__init__()
-    
-    # TODO:ホテルが立つときの挙動を実装
     def add_building(self):
-        self.total_buildings += 1
-        if self.total_buildings % self.NUM_OF_LANDS == 0:
-            self.buildings_per_lands += 1
-        print('A building is constracted!')
+        if self.num_houses <= 4:
+            self.num_houses += 1
 
-    def show_rent(self):
-
-        buildings_per_land = int(self.total_buildings // self.NUM_OF_LANDS)
-        if buildings_per_land in self.NUM_TO_RENT.keys():
-            print(f'{self.NUM_TO_RENT[buildings_per_land]}$')
         else:
-            print(f'{self.HOTEL}$')
+            self.num_houses = 0
+            self.num_hotels += 1
+        
+
+    def show_state(self):
+        print(f'houses: {self.num_houses}')
+        print(f'hotels: {self.num_hotels}')
 
 
-brown = Brown()
-brown.add_building()
-brown.add_building()
-brown.show_rent()
+class Color():
+
+    def __init__(self, streets: Iterable[Street]):
+        self.streets = streets
+        self.color = None
+
 
 # class Train:
 #     def __init__(self):
@@ -184,10 +174,12 @@ brown.show_rent()
 #     def __init__(self):
 
 # test
-# yusaku = Player('yusaku')
-# takeshun = Player('takeshun')
-# board = Board([yusaku, takeshun])
-# land = Land('test', 200, 50)
-# #%%
+yusaku = Player('yusaku')
+takeshun = Player('takeshun')
+board = Board([yusaku, takeshun])
+street = Street('red', 'test', 200, 50)
+street.owner = yusaku
+street.add_building()
+street.show_state()
 # land.be_bought(yusaku, board)
 # land.charge_rental(takeshun)
