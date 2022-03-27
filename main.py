@@ -48,6 +48,91 @@ class Board:
             name: player
             for name, player in zip(self.members_name, self.members)
         }
+        self.cell = (
+            Go,
+            Street(),
+            Pool(),
+            Street(''),
+            Incometax(),
+            Train(),
+            Street(),
+            Chance(),
+            Street(),
+            Street(),
+            Jail(),
+            Street(),
+            Public(),
+            Street(),
+            Street(),
+            Train(),
+            Street(),
+            Pool(),
+            Street(),
+            Street(),
+            Park(),
+            Street(),
+            Chance(),
+            Street(),
+            Street(),
+            Train(),
+            Street(),
+            Street(),
+            Public(),
+            Street(),
+            Gojail(),
+            Street(),
+            Street(),
+            Pool(),
+            Street(),
+            Train(),
+            Chance(),
+            Street(),
+            Luxurytax(),
+            Street(),
+        )
+
+# %%
+class Chance:
+    def __init__(self):
+        pass
+
+class Street:
+    def __init__(self):
+        pass
+
+class Pool:
+    def __init__(self):
+        pass
+
+class Train:
+    def __init__(self):
+        pass
+
+class Go: # スタート、ゴール
+    def __init__(self):
+        self.name = 'Go'
+
+    def __call__(self, player: Player, board: Board):
+        player.money += 200
+
+class Park:
+    def __init__(self):
+        self.name = 'Park'
+
+class Incometax:  # 税金
+    def __init__(self):
+        self.name = 'Income tax'
+
+    def __call__(self, player: Player, board: Board):
+        player.money -= 200
+
+class Luxurytax:  # 税金
+    def __init__(self):
+        self.name = 'Luxury tax'
+
+    def __call__(self, player: Player, board: Board):
+        player.money -= 100
+
 
 # %%
 class Land:
@@ -146,28 +231,22 @@ class Player:
         self.buildings: list[Street] = []
         self.public_business: list[Public] = []
         self.money: int = 1500
-        self.zorome: int = 0
-        self.dice: int = 0
+        self.dice = 0
+        self.zorome = 0
+        self.position = 0
         self.jailflag = False
 
     def throw_dice(self):
         dice1 = random.randint(1, 6)
         dice2 = random.randint(1, 6)
         self.dice = dice1 + dice2
+        self.position += self.dice
+
         if dice1 == dice2:
             self.zorome += 1
         else:
             self.zorome = 0
-        
-        if self.zorome == 3:  # ゾロ目連続3回で刑務所
-            self.posotion
-            self.jailflag = True
-            jail()
 
-# %%
-class Street:
-    def __init__(self):
-        pass
 
 # %%
 class Public(Land):
@@ -206,30 +285,16 @@ class Public(Land):
         self.owner.money += self.rental_price
 
 # %%
-class Chance:
-    def __init__(self):
-        pass
-
-# %%
-class Pool:
-    def __init__(self):
-        pass
-
-# %%
-
 class Gojail:
     def go_jail(self, player: Player):
         # jail にいって拘束状態
-        player.position += 10
         player.jailflag = True
-        jail()
-
-
+        Jail()
 
 # %%
-class jail:  
+class Jail:  
 
-    def __call__(self, player: Player, board: Board):
+    def __call__(self, player: Player):
         if player.jailflag:
             self.no_jail()
         else:
@@ -265,6 +330,30 @@ class jail:
             player.money -= 50
             # 釈放
 
+
+# %%
+# game
+num_player = int(input('Please enter the number of people playing'))
+member_list: list[Player] = []
+for i in range(num_player):
+    print('Make PLAYER. Enter a name.')
+    name = input('Input your name')
+    member_list.append(Player(name))
+board = Board(member_list)
+random.shuffle(member_list)
+print(
+    f'The order for rolling the dice has been decided. \n'
+    f'The order to proceed with the game was decided by {" ".join(member_list)}'
+)
+for player in member_list:
+    while player.zorome >= 1:
+        player.throw_dice()
+        if player.zorome == 3:  # ゾロ目連続3回で刑務所
+            player.zorome = 0
+            player.jailflag = True
+            Jail()
+        else:
+            board.cell[player.position](player, board)
 
 # %%
 # test
