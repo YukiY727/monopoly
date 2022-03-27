@@ -4,6 +4,7 @@ from __future__ import annotations
 from multiprocessing.connection import answer_challenge
 from random import random
 
+# %%
 def query_yes_no(question, default="yes"):
     """質問(yes/no)の回答をBool値で出力
 
@@ -37,7 +38,7 @@ def query_yes_no(question, default="yes"):
             print("Please respond with 'yes' or 'no' "
                   "(or 'y' or 'n').\n")
 
-
+# %%
 class Board:
 
     def __init__(self, members: list[Player]):
@@ -47,71 +48,8 @@ class Board:
             name: player
             for name, player in zip(self.members_name, self.members)
         }
-        self.cell = (
-            Go,
-            Street(),
-            Pool(),
-            Street(),
-            Incometax(),
-            Train(),
-            Street(),
-            Chance(),
-            Street(),
-            Street(),
-            Jail(),
-            Street(),
-            Public(),
-            Street(),
-            Street(),
-            Train(),
-            Street(),
-            Pool(),
-            Street(),
-            Street(),
-            Park(),
-            Street(),
-            Chance(),
-            Street(),
-            Street(),
-            Train(),
-            Street(),
-            Street(),
-            Public(),
-            Street(),
-            Gojail(),
-            Street(),
-            Street(),
-            Pool(),
-            Street(),
-            Train(),
-            Chance(),
-            Street(),
-            Luxurytax(),
-            Street(),
-        )
 
-class Go: # スタート、ゴール
-
-    def __init__(self):
-        self.name = 'Go'
-
-    def __call__(self, player: Player, board: Board):
-        player.money += 200
-
-class Incometax:  # 税金
-    def __init__(self):
-        self.name = 'Income tax'
-
-    def __call__(self, player: Player, board: Board):
-        player.money -= 200
-
-class Luxurytax:  # 税金
-    def __init__(self):
-        self.name = 'Luxury tax'
-
-    def __call__(self, player: Player, board: Board):
-        player.money -= 100
-
+# %%
 class Land:
 
     def __init__(self, name: str, price: int, rental_price: int, kind: str):
@@ -199,17 +137,18 @@ class Land:
         user.money -= self.rental_price
         self.owner.money += self.rental_price
 
-
+# %%
 class Player:
 
     def __init__(self, name: str):
         self.name = name
         self.train: list[Train] = []
-        self.buildings: list[Buildings] = []
+        self.buildings: list[Street] = []
         self.public_business: list[Public] = []
         self.money: int = 1500
         self.zorome: int = 0
         self.dice: int = 0
+        self.jailflag = False
 
     def throw_dice(self):
         dice1 = random.randint(1, 6)
@@ -221,26 +160,16 @@ class Player:
             self.zorome = 0
         
         if self.zorome == 3:  # ゾロ目連続3回で刑務所
+            self.posotion
+            self.jailflag = True
             jail()
 
+# %%
+class Street:
+    def __init__(self):
+        pass
 
-# class Street:
-#     def __init__(self):
-
-class Train(Land):
-
-    def __init__(self, name: str, kind: str):
-        super().__init__(name, 200, 50, kind)
-
-    def be_bought(self, player: Player, board: Board):
-        super().be_bought(player, board)
-        for owner_train in self.owner.train:
-            owner_train.change_rental()
-
-    def change_rental(self):
-        self.rental_price = 50 * len(self.owner.train)
-
-
+# %%
 class Public(Land):
 
     def __init__(self, name: str, price: int, kind: str):
@@ -276,13 +205,38 @@ class Public(Land):
         user.money -= self.rental_price
         self.owner.money += self.rental_price
 
-# class Chance:
-#     def __init__(self):
+# %%
+class Chance:
+    def __init__(self):
+        pass
 
-# class Pool:
-#     def __init__(self):
+# %%
+class Pool:
+    def __init__(self):
+        pass
 
+# %%
+
+class Gojail:
+    def go_jail(self, player: Player):
+        # jail にいって拘束状態
+        player.position += 10
+        player.jailflag = True
+        jail()
+
+
+
+# %%
 class jail:  
+
+    def __call__(self, player: Player, board: Board):
+        if player.jailflag:
+            self.no_jail()
+        else:
+            self.jail_in(player)
+
+    def no_jail():   # 普通にいくと素通り
+        pass
         
     def jail_in(self, player: Player):
         self.count = 0
@@ -290,7 +244,7 @@ class jail:
         answer1 = query_yes_no(f'Would you use (or buy) card and exit the jail ?')
             
         if answer1: # カードの使用
-            player.money += 0
+            pass
             # 釈放
 
         answer2 = query_yes_no(f'Would you pay $50 and exit the jail ?')
@@ -302,7 +256,7 @@ class jail:
             dice1 = random.randint(1, 6)
             dice2 = random.randint(1, 6)
             if dice1 == dice2:
-                player.money += 0
+                pass
                  #釈放　
             else:
                 self.count += 1
@@ -312,7 +266,7 @@ class jail:
             # 釈放
 
 
-
+# %%
 # test
 yusaku = Player('yusaku')
 takeshun = Player('takeshun')
