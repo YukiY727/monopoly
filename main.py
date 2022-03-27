@@ -1,6 +1,8 @@
 # %%
 from __future__ import annotations
 
+import random
+
 
 def query_yes_no(question, default="yes"):
     """質問(yes/no)の回答をBool値で出力
@@ -49,7 +51,7 @@ class Board:
             Go,
             Street(),
             Pool(),
-            Street(),
+            Street(''),
             Incometax(),
             Train(),
             Street(),
@@ -97,18 +99,42 @@ class Go:
     def __call__(self, player: Player, board: Board):
         player.money += 200
 
+
+class Park:
+
+    def __init__(self):
+        self.name = 'Park'
+
+
+class Gojail:
+
+    def __init__(self) -> None:
+        pass
+
+
 class Incometax:
+
     def __init__(self):
         self.name = 'Income tax'
 
     def __call__(self, player: Player, board: Board):
         player.money -= 200
+
+
 class Luxurytax:
+
     def __init__(self):
         self.name = 'Luxury tax'
 
     def __call__(self, player: Player, board: Board):
         player.money -= 100
+
+
+class Jail:
+
+    def __init__(self) -> None:
+        pass
+
 
 class Land:
 
@@ -208,6 +234,21 @@ class Player:
         self.train: list[Train] = []
         self.public_business: list[Public] = []
         self.money: int = 1500
+        self.dice = 0
+        self.zorome = 0
+        self.position = 0
+
+    def throw_dice(self):
+        dice1 = random.randint(1, 6)
+        dice2 = random.randint(1, 6)
+        self.dice = dice1 + dice2
+        self.position += self.dice
+
+        if dice1 == dice2:
+            self.zorome += 1
+        else:
+            self.zorome = 0
+
 
 
 class Street:
@@ -249,6 +290,27 @@ class Pool:
 
 
 # %%
+num_player = int(input('Please enter the number of people playing'))
+member_list: list[Player] = []
+for i in range(num_player):
+    print('Make PLAYER. Enter a name.')
+    name = input('Input your name')
+    member_list.append(Player(name))
+board = Board(member_list)
+random.shuffle(member_list)
+print(
+    f'The order for rolling the dice has been decided. \n'
+    f'The order to proceed with the game was decided by {" ".join(member_list)}'
+)
+for player in member_list:
+    while player.zorome >= 1:
+        player.throw_dice()
+        if player.zorome == 3:  # ゾロ目連続3回で刑務所
+            player.zorome = 0
+            Gojail()
+        else:
+            board.cell[player.position](player, board)
+# %%
 # test
 yusaku = Player('yusaku')
 takeshun = Player('takeshun')
@@ -262,4 +324,3 @@ train2 = Train('train2', 'train')
 train1(yusaku, board)
 train2(yusaku, board)
 train1(takeshun, board)
-# %%
