@@ -185,6 +185,7 @@ class Street(Land):
         if self.num_hotels:
             rental_price = self.rental_price['hotel']
         else:
+            # TODO: 家の数でレンタル料変わるようにする
             rental_price = self.rental_price['house']
         player.money -= rental_price
         print(f'charged {rental_price} to {player.name}!')
@@ -205,7 +206,7 @@ class Color():
         if not street_name in street_names:
             raise ValueError('不正なstreet名')
         owners = set(street.owner for street in self.streets)
-        monopolied = len(owners) == 1 and not None in owners
+        monopolied = (len(owners) == 1 and not None in owners)
         # その土地とほかの土地の建物数の差が1以下なら購入可能
         num_houses = [street.num_houses for street in self.streets]
         num_hotels = [street.num_hotels for street in self.streets]
@@ -213,6 +214,9 @@ class Color():
             num_hotels) - min(num_hotels) <= 1
         can_buy = monopolied and is_valid_nums
         return can_buy
+
+
+# TODO:実行スクリプトを作ってみる(建物の数につじつまを合わせて購入)
 
 
 class Train(Land):
@@ -245,7 +249,6 @@ class Train(Land):
 yusaku = Player('yusaku')
 takeshun = Player('takeshun')
 board = Board([yusaku, takeshun])
-
 street1 = Street('red', 'test1', 200, 50)
 street2 = Street('red', 'test2', 100, 25)
 
@@ -260,8 +263,4 @@ street2.owner = yusaku
 if color.can_buy_building('test1'):
     print('can_buy')
 
-# land.be_bought(yusaku, board)
-train1.be_bought(yusaku, board)
-train2.be_bought(yusaku, board)
-train1.charge_rental(takeshun)
 # %%
