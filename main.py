@@ -284,32 +284,32 @@ class Public(Land):
 
 class jail:  
         
-        def jail_in(self, player: Player):
-            self.count = 0
+    def jail_in(self, player: Player):
+        self.count = 0
 
-            answer1 = query_yes_no(f'Would you use (or buy) card and exit the jail ?')
+        answer1 = query_yes_no(f'Would you use (or buy) card and exit the jail ?')
             
-            if answer1: # カードの使用
+        if answer1: # カードの使用
+            player.money += 0
+            # 釈放
+
+        answer2 = query_yes_no(f'Would you pay $50 and exit the jail ?')
+
+        if answer2: # サイコロを振る前に50$払う
+            player.money -= 50
+            # 釈放
+        else: # diceを振る　# 3ターン以内にゾロ目を出す。出なかったら強制50$支払い
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            if dice1 == dice2:
                 player.money += 0
-                # 釈放
-
-            answer2 = query_yes_no(f'Would you pay $50 and exit the jail ?')
-
-            if answer2: # サイコロを振る前に50$払う
-                player.money -= 50
-                # 釈放
-            else: # diceを振る　# 3ターン以内にゾロ目を出す。出なかったら強制50$支払い
-                dice1 = random.randint(1, 6)
-                dice2 = random.randint(1, 6)
-                if dice1 == dice2:
-                    player.money += 0
-                    #釈放　
-                else:
-                    self.count += 1
+                 #釈放　
+            else:
+                self.count += 1
            
-            if self.count == 3:
-                player.money -= 50
-                # 釈放
+        if self.count == 3:
+            player.money -= 50
+            # 釈放
 
 
 
