@@ -3,6 +3,33 @@ from __future__ import annotations
 
 from typing import Dict, Iterable
 
+# Streetごとの家の賃貸料変化表
+# 行：Street番号, 列：[rent_1_house, rent_2_house, rent_3_house, rent_4_house, rent_hotel]
+matrix = [
+    [4, 20, 60, 180, 320, 450],  # BALTIC
+    [2, 10, 30, 90, 160, 250],  # MEDITERRANEAN
+    [6, 30, 90, 270, 400, 550],  # ORIENTAL
+    [6, 30, 90, 270, 400, 550],  # VERMONT
+    [8, 40, 100, 300, 450, 600],  # CONNRCTICUT
+    [10, 50, 150, 450, 625, 750],  # ST.CHARLES
+    [10, 50, 150, 450, 625, 750],  # STATES
+    [12, 60, 180, 500, 700, 900],  # VIRGINIA
+    [16, 80, 220, 600, 800, 1000],  # NEW YORK
+    [14, 70, 200, 550, 750, 950],  # TENNESSEE
+    [14, 70, 200, 550, 750, 950],  # ST.JAMES
+    [18, 90, 250, 700, 875, 1050],  # INDIANA
+    [20, 100, 300, 750, 925, 1100],  # ILLINOIS
+    [18, 90, 250, 700, 875, 1050],  # KENTUCKY
+    [24, 120, 360, 850, 1025, 1200],  # MARVIN
+    [22, 110, 330, 800, 975, 1150],  # ATLANTIC
+    [22, 110, 330, 800, 975, 1150],  # VENTNOR
+    [28, 150, 450, 1000, 1200, 1400],  # PENNSYLVANIA
+    [26, 130, 390, 900, 1100, 1275],  # NORTH CAROLINA
+    [26, 130, 390, 900, 1100, 1275],  # PACIFIC
+    [35, 175, 500, 1100, 1300, 1500],  # PARK
+    [50, 200, 600, 1400, 1700, 2000]  # BOARDWALK
+]
+
 
 def query_yes_no(question, default="yes"):
     """質問(yes/no)の回答をBool値で出力
