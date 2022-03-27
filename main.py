@@ -245,7 +245,7 @@ class Train(Land):
 yusaku = Player('yusaku')
 takeshun = Player('takeshun')
 board = Board([yusaku, takeshun])
-<<<<<<< HEAD
+
 street1 = Street('red', 'test1', 200, 50)
 street2 = Street('red', 'test2', 100, 25)
 
@@ -260,14 +260,6 @@ street2.owner = yusaku
 if color.can_buy_building('test1'):
     print('can_buy')
 
-=======
-
-
-# land = Land('test', 200, 50)
-train1 = Train('train1', 'train')
-train2 = Train('train2','train')
-#%%
->>>>>>> 61bf11346d7ceb3b243652cc6130937a7a15d0ba
 # land.be_bought(yusaku, board)
 train1.be_bought(yusaku, board)
 train2.be_bought(yusaku, board)
