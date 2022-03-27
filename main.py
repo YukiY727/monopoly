@@ -1,7 +1,8 @@
 
 # %%
 from __future__ import annotations
-
+from multiprocessing.connection import answer_challenge
+from random import random
 
 def query_yes_no(question, default="yes"):
     """質問(yes/no)の回答をBool値で出力
@@ -46,7 +47,70 @@ class Board:
             name: player
             for name, player in zip(self.members_name, self.members)
         }
+        self.cell = (
+            Go,
+            Street(),
+            Pool(),
+            Street(),
+            Incometax(),
+            Train(),
+            Street(),
+            Chance(),
+            Street(),
+            Street(),
+            Jail(),
+            Street(),
+            Public(),
+            Street(),
+            Street(),
+            Train(),
+            Street(),
+            Pool(),
+            Street(),
+            Street(),
+            Park(),
+            Street(),
+            Chance(),
+            Street(),
+            Street(),
+            Train(),
+            Street(),
+            Street(),
+            Public(),
+            Street(),
+            Gojail(),
+            Street(),
+            Street(),
+            Pool(),
+            Street(),
+            Train(),
+            Chance(),
+            Street(),
+            Luxurytax(),
+            Street(),
+        )
 
+class Go: # スタート、ゴール
+
+    def __init__(self):
+        self.name = 'Go'
+
+    def __call__(self, player: Player, board: Board):
+        player.money += 200
+
+class Incometax:  # 税金
+    def __init__(self):
+        self.name = 'Income tax'
+
+    def __call__(self, player: Player, board: Board):
+        player.money -= 200
+
+class Luxurytax:  # 税金
+    def __init__(self):
+        self.name = 'Luxury tax'
+
+    def __call__(self, player: Player, board: Board):
+        player.money -= 100
 
 class Land:
 
@@ -59,18 +123,24 @@ class Land:
         self.rental_price = rental_price
         self.kind = kind
 
+    def __call__(self, player: Player, board: Board):
+        if self.owner:
+            self.charge_rental(player)
+        else:
+            self.be_bought(player, board)
 
-    def be_bought(self, plyer: Player, board: Board):
+
+    def be_bought(self, player: Player, board: Board):
         answer = query_yes_no(f'Would you buy this land for {self.price} ?')
         if answer:
             if self.kind == 'building':
-                plyer.buildings.append(self)
+                player.buildings.append(self)
             elif self.kind == 'train':
-                plyer.train.append(self)
+                player.train.append(self)
             elif self.kind == 'public_business':
-                plyer.public_business.append(self)
-            self.owner = plyer
-            plyer.money -= self.price
+                player.public_business.append(self)
+            self.owner = player
+            player.money -= self.price
         else:
             self.auction(board)
 
@@ -114,12 +184,12 @@ class Land:
                 self.is_own = True
                 self.owner.money -= auction_price
                 break
+
     def cancel_mortgage(self):
         self.is_mortgage = False
         self.is_own = True
         self.owner.money -= round(self.price / 2 * 1.1)
         
-
     def put_in_mortgage(self):
         self.owner.money += self.price / 2
         self.is_own = False
@@ -138,18 +208,49 @@ class Player:
         self.buildings: list[Buildings] = []
         self.public_business: list[Public] = []
         self.money: int = 1500
+        self.zorome: int = 0
+        self.dice: int = 0
+
+    def throw_dice(self):
+        dice1 = random.randint(1, 6)
+        dice2 = random.randint(1, 6)
+        self.dice = dice1 + dice2
+        if dice1 == dice2:
+            self.zorome += 1
+        else:
+            self.zorome = 0
+        
+        if self.zorome == 3:  # ゾロ目連続3回で刑務所
+            jail()
 
 
-# class Buildings:
+# class Street:
 #     def __init__(self):
 
-# class Train:
-#     def __init__(self):
+class Train(Land):
+
+    def __init__(self, name: str, kind: str):
+        super().__init__(name, 200, 50, kind)
+
+    def be_bought(self, player: Player, board: Board):
+        super().be_bought(player, board)
+        for owner_train in self.owner.train:
+            owner_train.change_rental()
+
+    def change_rental(self):
+        self.rental_price = 50 * len(self.owner.train)
+
 
 class Public(Land):
 
     def __init__(self, name: str, price: int, kind: str):
         super().__init__(name, price, 0, kind)
+
+    def __call__(self, player: Player, board: Board):
+        if self.owner:
+            self.pay_rental(player)
+        else:
+            self.be_bought(player, board)
 
     def be_bought(self, plyer: Player, board: Board):
         super().be_bought(plyer, board)
@@ -158,17 +259,13 @@ class Public(Land):
         super().be_bought(board)
 
     def cancel_mortgage(self):
-        self.is_mortgage = False
-        self.is_own = True
-        self.owner.money -= round(self.price / 2 * 1.1)
+        super().cancel_mortgage()
         
     def put_in_mortgage(self):
-        self.owner.money += 75
-        self.is_own = False
-        self.is_mortgage = True
+        super().put_in_mortgage()
 
     def pay_rental(self, user: Player):
-        dice = int(input())
+        dice = user.dice
         #if chance:
         #    self.rental_price = dice * 10
         #else:
@@ -185,7 +282,34 @@ class Public(Land):
 # class Pool:
 #     def __init__(self):
 
-# class jail:
+class jail:  
+        
+        def jail_in(self, player: Player):
+            self.count = 0
+
+            answer1 = query_yes_no(f'Would you use (or buy) card and exit the jail ?')
+            
+            if answer1: # カードの使用
+                player.money += 0
+                # 釈放
+
+            answer2 = query_yes_no(f'Would you pay $50 and exit the jail ?')
+
+            if answer2: # サイコロを振る前に50$払う
+                player.money -= 50
+                # 釈放
+            else: # diceを振る　# 3ターン以内にゾロ目を出す。出なかったら強制50$支払い
+                dice1 = random.randint(1, 6)
+                dice2 = random.randint(1, 6)
+                if dice1 == dice2:
+                    player.money += 0
+                    #釈放　
+                else:
+                    self.count += 1
+           
+            if self.count == 3:
+                player.money -= 50
+                # 釈放
 
 
 
