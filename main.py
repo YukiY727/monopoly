@@ -5,7 +5,7 @@ from typing import Dict, Iterable
 
 # Streetごとの家の賃貸料変化表
 # 行：Street番号, 列：[rent_1_house, rent_2_house, rent_3_house, rent_4_house, rent_hotel]
-matrix = [
+rental_price_matrix = [
     [4, 20, 60, 180, 320, 450],  # BALTIC
     [2, 10, 30, 90, 160, 250],  # MEDITERRANEAN
     [6, 30, 90, 270, 400, 550],  # ORIENTAL
@@ -29,6 +29,14 @@ matrix = [
     [35, 175, 500, 1100, 1300, 1500],  # PARK
     [50, 200, 600, 1400, 1700, 2000]  # BOARDWALK
 ]
+streets = ('baltic', 'mediterranean', 'oriental', 'vermont', 'connrcticut',
+           'st.charles', 'states', 'virginia', 'new york', 'tennessee', 'st.james',
+           'indiana', 'illinois', 'kentucky', 'marvin', 'atlantic', 'ventnor',
+           'pennsylvania', 'north caroliana', 'pacific', 'park', 'boardwalk')
+
+street_to_idx = {}
+for idx, street in enumerate(streets):
+    street_to_idx[street] = idx
 
 
 def query_yes_no(question, default="yes"):
@@ -164,7 +172,7 @@ class Player:
     def __init__(self, name: str):
         self.name = name
         self.train: list[Train] = []
-        self.buildings: list[Buildings] = []
+        self.buildings: list[Street] = []
         self.train: list[Train] = []
         self.public_business: list[Public] = []
         self.money: int = 1500
@@ -182,19 +190,20 @@ class Player:
 
 class Street(Land):
     # TODO: Landと実装を合わせる
-    def __init__(self, color: str, name: str, price: int,
-                 rental_price: int):
+    def __init__(self, color: str, name: str, price: int):
         """
         color: 通りのカードの色
         name: 通りの名前
         price: 通りの値段
-        rental_price: 通行料の初期値
         """
         super().__init__(name, price)
         self.num_houses = 0
         self.num_hotels = 0
         self.color = color
-        self.rental_price = rental_price
+        self.name = name.lower()
+        street_idx = street_to_idx[self.name]
+        self.rental_price_idx = 0
+        self.rental_prices = rental_price_matrix[street_idx]
 
     def add_building(self):
         if self.num_houses <= 4:
