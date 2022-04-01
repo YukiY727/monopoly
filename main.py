@@ -197,34 +197,22 @@ class Street(Land):
         price: 通りの値段
         """
         super().__init__(name, price)
-        self.num_houses = 0
-        self.num_hotels = 0
+        self.num_buildings = 0
         self.color = color
         self.name = name.lower()
         street_idx = street_to_idx[self.name]
-        self.rental_price_idx = 0
         self.rental_prices = rental_price_matrix[street_idx]
 
     def add_building(self):
-        if self.num_houses <= 4:
-            self.num_houses += 1
-
-        else:
-            self.num_houses = 0
-            self.num_hotels += 1
+        self.num_buildings += 1
 
     def charge_rental(self, player: Player):
-        if self.num_hotels:
-            rental_price = self.rental_price['hotel']
-        else:
-            # TODO: 家の数でレンタル料変わるようにする
-            rental_price = self.rental_price['house']
+        rental_price = self.rental_prices[self.num_buildings]
         player.money -= rental_price
         print(f'charged {rental_price} to {player.name}!')
 
     def show_state(self):
-        print(f'houses: {self.num_houses}')
-        print(f'hotels: {self.num_hotels}')
+        print(f'<num_buildings>: {self.num_buildings}')
 
 
 class Color():
