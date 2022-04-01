@@ -154,24 +154,20 @@ class Player:
 
 
 class Street(Land):
-
+    # TODO: Landと実装を合わせる
     def __init__(self, color: str, name: str, price: int,
-                 rental_price_house: Iterable(int), rental_price_hotel: int):
+                 rental_price: int):
         """
         color: 通りのカードの色
         name: 通りの名前
         price: 通りの値段
-        rental_price_house: 家の個数に対する通行料
-        rental_price_hotel: ホテルの個数に対する通行料
+        rental_price: 通行料の初期値
         """
         super().__init__(name, price)
         self.num_houses = 0
         self.num_hotels = 0
         self.color = color
-        self.rental_price = {
-            'house': rental_price_house,
-            'hotel': rental_price_hotel
-        }
+        self.rental_price = rental_price
 
     def add_building(self):
         if self.num_houses <= 4:
