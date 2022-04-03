@@ -1,7 +1,6 @@
 
 # %%
 from __future__ import annotations
-from multiprocessing.connection import answer_challenge
 from random import random
 
 def query_yes_no(question, default="yes"):
@@ -145,7 +144,7 @@ class Land:
             elif self.kind == 'train':
                 player.train.append(self)
             elif self.kind == 'public_business':
-                player.public_business.append(self) # player.train.append(self)
+                player.public_business.append(self)
             self.owner = player
             player.money -= self.price
         else:
@@ -243,7 +242,7 @@ class Street:
 
 
 class Train(Land):
-
+    pass
 # %%
 class Public(Land):
 
