@@ -207,9 +207,9 @@ class Street(Land):
 
 class Color():
 
-    def __init__(self, streets: Iterable[Street]):
+    def __init__(self,color:str, streets: Iterable[Street]):
         self.streets = streets
-        self.color = None
+        self.color = color
 
     def can_buy_building(self, street_name: str):
         street_names = [street.name for street in self.streets]
