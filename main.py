@@ -1,8 +1,7 @@
+
 # %%
 from __future__ import annotations
-
-import random
-
+from random import random
 
 def query_yes_no(question, default="yes"):
     """質問(yes/no)の回答をBool値で出力
@@ -37,7 +36,7 @@ def query_yes_no(question, default="yes"):
             print("Please respond with 'yes' or 'no' "
                   "(or 'y' or 'n').\n")
 
-
+# %%
 class Board:
 
     def __init__(self, members: list[Player]):
@@ -90,7 +89,6 @@ class Board:
             Street(),
         )
 
-
 class Go:
 
     def __init__(self):
@@ -99,18 +97,10 @@ class Go:
     def __call__(self, player: Player, board: Board):
         player.money += 200
 
-
 class Park:
 
     def __init__(self):
         self.name = 'Park'
-
-
-class Gojail:
-
-    def __init__(self) -> None:
-        pass
-
 
 class Incometax:
 
@@ -120,7 +110,6 @@ class Incometax:
     def __call__(self, player: Player, board: Board):
         player.money -= 200
 
-
 class Luxurytax:
 
     def __init__(self):
@@ -128,13 +117,6 @@ class Luxurytax:
 
     def __call__(self, player: Player, board: Board):
         player.money -= 100
-
-
-class Jail:
-
-    def __init__(self) -> None:
-        pass
-
 
 class Land:
 
@@ -145,7 +127,6 @@ class Land:
         self.owner = None
         self.is_mortgage = False
         self.rental_price = rental_price
-        self.is_mortgage = False
         self.kind = kind
 
     def __call__(self, player: Player, board: Board):
@@ -162,7 +143,7 @@ class Land:
             elif self.kind == 'train':
                 player.train.append(self)
             elif self.kind == 'public_business':
-                player.train.append(self)
+                player.public_business.append(self)
             self.owner = player
             player.money -= self.price
         else:
@@ -194,8 +175,7 @@ class Land:
             print(
                 f'{self.name}\'s price is {auction_price} now (offered by {self.owner.name})\n'
             )
-            continue_auction = query_yes_no(
-                f'Is there anyone who buys {self.name} at a higher price?\n')
+            continue_auction = query_yes_no(f'Is there anyone who buys {self.name} at a higher price?\n')
             if not continue_auction:
                 print(
                     f'{self.name} is bought by {self.owner.name} for {auction_price}!'
@@ -224,19 +204,19 @@ class Land:
         user.money -= self.rental_price
         self.owner.money += self.rental_price
 
-
+# %%
 class Player:
 
     def __init__(self, name: str):
         self.name = name
         self.train: list[Train] = []
-        self.buildings: list[Buildings] = []
-        self.train: list[Train] = []
+        self.buildings: list[Street] = []
         self.public_business: list[Public] = []
         self.money: int = 1500
         self.dice = 0
         self.zorome = 0
         self.position = 0
+        self.jailflag = False
 
     def throw_dice(self):
         dice1 = random.randint(1, 6)
@@ -261,7 +241,6 @@ class Street:
 
 
 class Train(Land):
-
     def __init__(self, name: str, kind: str):
         super().__init__(name, 200, 50, kind)
 
@@ -272,13 +251,27 @@ class Train(Land):
 
     def change_rental(self):
         self.rental_price = 50 * len(self.owner.train)
+# %%
+class Public(Land):
 
+    def __init__(self, name: str, price: int, kind: str):
+        super().__init__(name, price, 0, kind)
+        self.rental_ratio = 4
 
-class Public:
+    def be_bought(self, plyer: Player, board: Board):
+        super().be_bought(plyer, board)
 
-    def __init__(self):
-        pass
+        for owner_public_business in self.owner.public_business:
+            if len(self.owner.public_business) == 2:  # ElectricとWaterworksの所有者が同じ  
+                owner_public_business.rental_ratio = 10
+            elif len(self.owner.public_business) == 1: # どちらか一つ所有
+                owner_public_business.rental_ratio =  4
 
+    def charge_rental(self, user: Player):
+        self.rental_price = user.dice * self.rental_ratio
+
+        user.money -= self.rental_price
+        self.owner.money += self.rental_price
 
 class Chance:
 
@@ -290,6 +283,50 @@ class Pool:
 
     def __init__(self):
         pass
+
+# %%
+class Gojail:
+    def go_jail(self, player: Player):
+        # jail にいって拘束状態
+        player.jailflag = True
+        Jail()
+
+# %%
+class Jail:  
+
+    def __call__(self, player: Player):
+        if player.jailflag:
+            self.no_jail()   # 普通にいくと素通り
+        else:
+            self.jail_in(player) 
+
+    def no_jail():
+        pass
+        
+    def jail_in(self, player: Player):
+        self.count = 0
+
+        answer1 = query_yes_no(f'Would you use (or buy) card and exit the jail ?')           
+        if answer1: # カードの使用
+            pass
+            # 釈放
+        else:
+            answer2 = query_yes_no(f'Would you pay $50 and exit the jail ?')
+            if answer2: # サイコロを振る前に50$払う
+                player.money -= 50
+                # 釈放
+            else: # diceを振る　# 3ターン以内にゾロ目を出す。出なかったら強制50$支払い
+                dice1 = random.randint(1, 6)
+                dice2 = random.randint(1, 6)
+                if dice1 == dice2:
+                    pass
+                    #釈放　
+                else:
+                    self.count += 1 
+
+                if self.count == 3:
+                    player.money -= 50
+                    # 釈放
 
 
 # %%
@@ -313,7 +350,7 @@ for player in board.members:
         print(board.cell[player.position])
         if player.zorome == 3:  # ゾロ目連続3回で刑務所
             player.zorome = 0
-            Gojail()
+            Jail()
         else:
             board.cell[player.position](player, board)
 
