@@ -219,20 +219,26 @@ class Player:
         self.jailflag = False
 
     def throw_dice(self):
-        if self.zorome == 3:
-            Jail()
-        else:
-            dice1 = random.randint(1, 6)
-            dice2 = random.randint(1, 6)
-            self.dice = dice1 + dice2
-            self.position += self.dice
 
+        dice1 = random.randint(1, 6)
+        dice2 = random.randint(1, 6)
+        self.dice = dice1 + dice2
         if dice1 == dice2:
             self.zorome += 1
-            self.throw_dice(self)
+            if self.zorome == 3:
+                self.position += 1 # Jailの位置に行く
+                self.jailflag = True
+                Jail()
+            else:
+                self.position += self.dice
+                print(self.dice)
+                # そのマスの行動をする
+                self.throw_dice(self)
         else:
             self.zorome = 0
-        print(self.dice)
+            self.position += self.dice
+            print(self.dice)
+            # そのマスの行動をする
 
     def __repr__(self) -> str:
         return self.name
@@ -266,9 +272,9 @@ class Public(Land):
         super().be_bought(plyer, board)
 
         for owner_public_business in self.owner.public_business:
-            if len(self.owner.public_business) == 2:  # ElectricとWaterworksの所有者が同じ  
+            if len(self.owner.public_business) == 2: 
                 owner_public_business.rental_ratio = 10
-            elif len(self.owner.public_business) == 1: # どちらか一つ所有
+            elif len(self.owner.public_business) == 1: 
                 owner_public_business.rental_ratio =  4
 
     def charge_rental(self, user: Player):
@@ -291,8 +297,8 @@ class Pool:
 # %%
 class Gojail:
     def go_jail(self, player: Player):
-        # jail にいって拘束状態
         player.jailflag = True
+        player.position += 1 # Jailマスまで
         Jail()
 
 # %%
@@ -316,10 +322,10 @@ class Jail:
             # 釈放
         else:
             answer2 = query_yes_no(f'Would you pay $50 and exit the jail ?')
-            if answer2: # サイコロを振る前に50$払う
+            if answer2:
                 player.money -= 50
                 # 釈放
-            else: # diceを振る　# 3ターン以内にゾロ目を出す。出なかったら強制50$支払い
+            else:
                 dice1 = random.randint(1, 6)
                 dice2 = random.randint(1, 6)
                 if dice1 == dice2:
