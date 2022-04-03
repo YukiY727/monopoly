@@ -306,14 +306,11 @@ class Jail:
     def jail_in(self, player: Player):
         self.count = 0
 
-        answer1 = query_yes_no(f'Would you use (or buy) card and exit the jail ?')
-            
+        answer1 = query_yes_no(f'Would you use (or buy) card and exit the jail ?')           
         if answer1: # カードの使用
             pass
             # 釈放
-
         answer2 = query_yes_no(f'Would you pay $50 and exit the jail ?')
-
         if answer2: # サイコロを振る前に50$払う
             player.money -= 50
             # 釈放
@@ -324,8 +321,7 @@ class Jail:
                 pass
                  #釈放　
             else:
-                self.count += 1
-           
+                self.count += 1    
         if self.count == 3:
             player.money -= 50
             # 釈放
