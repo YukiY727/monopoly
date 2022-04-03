@@ -50,7 +50,6 @@ class Board:
             Go,
             Street(),
             Pool(),
-
             Street(),
             Incometax(),
             Train('READING RAILROAD', 'train'),
@@ -262,12 +261,13 @@ class Public(Land):
     def be_bought(self, plyer: Player, board: Board):
         super().be_bought(plyer, board)
 
-        if len(self.owner.public_business) == 2:  # ElectricとWaterworksの所有者が同じ  
-            self.rental_ratio = 10
-        elif len(self.owner.public_business) == 1: # どちらか一つ所有
-            self.rental_ratio =  4
+        for owner_public_business in self.owner.public_business:
+            if len(self.owner.public_business) == 2:  # ElectricとWaterworksの所有者が同じ  
+                owner_public_business.rental_ratio = 10
+            elif len(self.owner.public_business) == 1: # どちらか一つ所有
+                owner_public_business.rental_ratio =  4
 
-    def pay_rental(self, user: Player):
+    def charge_rental(self, user: Player):
         self.rental_price = user.dice * self.rental_ratio
 
         user.money -= self.rental_price
@@ -296,11 +296,11 @@ class Jail:
 
     def __call__(self, player: Player):
         if player.jailflag:
-            self.no_jail()
+            self.no_jail()   # 普通にいくと素通り
         else:
-            self.jail_in(player)
+            self.jail_in(player) 
 
-    def no_jail():   # 普通にいくと素通り
+    def no_jail():
         pass
         
     def jail_in(self, player: Player):
