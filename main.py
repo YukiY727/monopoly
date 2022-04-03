@@ -111,8 +111,7 @@ class Land:
             self.auction(board)
 
     def auction(self, board: Board):
-        auction_price = None
-        while True:
+            auction_price = None
             print(
                 f'{self.name} is now for sale. Please include your user name and the amount you can offer\n'
             )
@@ -150,7 +149,7 @@ class Land:
                     self.owner.public_business.append(self)
                 self.is_own = True
                 self.owner.money -= auction_price
-                break
+                # break
 
     def cancel_mortgage(self):
         self.is_mortgage = False
@@ -190,7 +189,7 @@ class Player:
 
 class Street(Land):
     # TODO: Landと実装を合わせる
-    def __init__(self, color: str, name: str, price: int):
+    def __init__(self, color: str, name: str, price: int, kind) :
         """
         color: 通りのカードの色
         name: 通りの名前
@@ -228,10 +227,8 @@ class Color():
         owners = set(street.owner for street in self.streets)
         monopolied = (len(owners) == 1 and not None in owners)
         # その土地とほかの土地の建物数の差が1以下なら購入可能
-        num_houses = [street.num_houses for street in self.streets]
-        num_hotels = [street.num_hotels for street in self.streets]
-        is_valid_nums = max(num_houses) - min(num_houses) <= 1 and max(
-            num_hotels) - min(num_hotels) <= 1
+        num_buildings = [street.num_buildings for street in self.streets]
+        is_valid_nums = (max(num_buildings) - min(num_buildings) <= 1)
         can_buy = monopolied and is_valid_nums
         return can_buy
 
