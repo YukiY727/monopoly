@@ -177,16 +177,6 @@ class Player:
         self.public_business: list[Public] = []
         self.money: int = 1500
 
-    def giveup_or_continue(self):
-        if self.land:
-            put_in_mortgage = query_yes_no('Would you put your land to mortgage?')
-            if put_in_mortgage:
-                pass
-                # TODO:continueする処理
-        else:
-            pass
-            # TODO:やめる処理の追加
-
 
 class Street(Land):
     # TODO: Landと実装を合わせる
