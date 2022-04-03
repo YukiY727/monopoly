@@ -1,6 +1,8 @@
 # %%
 from __future__ import annotations
 
+import random
+
 
 def query_yes_no(question, default="yes"):
     """質問(yes/no)の回答をBool値で出力
@@ -45,6 +47,93 @@ class Board:
             name: player
             for name, player in zip(self.members_name, self.members)
         }
+        self.cell = (
+            Go,
+            Street(),
+            Pool(),
+            Street(),
+            Incometax(),
+            Train('READING RAILROAD', 'train'),
+            Street(),
+            Chance(),
+            Street(),
+            Street(),
+            Jail(),
+            Street(),
+            Public(),
+            Street(),
+            Street(),
+            Train('PENNSYLVANIA RAILROAD', 'train'),
+            Street(),
+            Pool(),
+            Street(),
+            Street(),
+            Park(),
+            Street(),
+            Chance(),
+            Street(),
+            Street(),
+            Train('B. & O. RAILROAD', 'train'),
+            Street(),
+            Street(),
+            Public(),
+            Street(),
+            Gojail(),
+            Street(),
+            Street(),
+            Pool(),
+            Street(),
+            Train('SHORT', 'train'),
+            Chance(),
+            Street(),
+            Luxurytax(),
+            Street(),
+        )
+
+
+class Go:
+
+    def __init__(self):
+        self.name = 'Go'
+
+    def __call__(self, player: Player, board: Board):
+        player.money += 200
+
+
+class Park:
+
+    def __init__(self):
+        self.name = 'Park'
+
+
+class Gojail:
+
+    def __init__(self) -> None:
+        pass
+
+
+class Incometax:
+
+    def __init__(self):
+        self.name = 'Income tax'
+
+    def __call__(self, player: Player, board: Board):
+        player.money -= 200
+
+
+class Luxurytax:
+
+    def __init__(self):
+        self.name = 'Luxury tax'
+
+    def __call__(self, player: Player, board: Board):
+        player.money -= 100
+
+
+class Jail:
+
+    def __init__(self) -> None:
+        pass
 
 
 class Land:
@@ -59,17 +148,23 @@ class Land:
         self.is_mortgage = False
         self.kind = kind
 
-    def be_bought(self, plyer: Player, board: Board):
+    def __call__(self, player: Player, board: Board):
+        if self.owner:
+            self.charge_rental(player)
+        else:
+            self.be_bought(player, board)
+
+    def be_bought(self, player: Player, board: Board):
         answer = query_yes_no(f'Would you buy this land for {self.price} ?')
         if answer:
             if self.kind == 'building':
-                plyer.buildings.append(self)
+                player.buildings.append(self)
             elif self.kind == 'train':
-                plyer.train.append(self)
+                player.train.append(self)
             elif self.kind == 'public_business':
-                plyer.train.append(self)
-            self.owner = plyer
-            plyer.money -= self.price
+                player.train.append(self)
+            self.owner = player
+            player.money -= self.price
         else:
             self.auction(board)
 
@@ -139,10 +234,30 @@ class Player:
         self.train: list[Train] = []
         self.public_business: list[Public] = []
         self.money: int = 1500
+        self.dice = 0
+        self.zorome = 0
+        self.position = 0
+
+    def throw_dice(self):
+        dice1 = random.randint(1, 6)
+        dice2 = random.randint(1, 6)
+        self.dice = dice1 + dice2
+        self.position += self.dice
+
+        if dice1 == dice2:
+            self.zorome += 1
+        else:
+            self.zorome = 0
+        print(self.dice)
+
+    def __repr__(self) -> str:
+        return self.name
 
 
-# class Building:
-#     def __init__(self):
+class Street:
+
+    def __init__(self):
+        pass
 
 
 class Train(Land):
@@ -150,8 +265,8 @@ class Train(Land):
     def __init__(self, name: str, kind: str):
         super().__init__(name, 200, 50, kind)
 
-    def be_bought(self, plyer: Player, board: Board):
-        super().be_bought(plyer, board)
+    def be_bought(self, player: Player, board: Board):
+        super().be_bought(player, board)
         for owner_train in self.owner.train:
             owner_train.change_rental()
 
@@ -159,17 +274,48 @@ class Train(Land):
         self.rental_price = 50 * len(self.owner.train)
 
 
-# class Waterworks:
-#     def __init__(self):
+class Public:
 
-# class Electric:
-#     def __init__(self):
+    def __init__(self):
+        pass
 
-# class Chance:
-#     def __init__(self):
 
-# class Pool:
-#     def __init__(self):
+class Chance:
+
+    def __init__(self):
+        pass
+
+
+class Pool:
+
+    def __init__(self):
+        pass
+
+
+# %%
+num_player = int(input('Please enter the number of people playing'))
+assert 2 <= num_player <= 8, 'MONOPOLY is a game for 2-8 players.'
+member_list: list[Player] = []
+for i in range(num_player):
+    print('Make PLAYER. Enter a name.')
+    name = input('Input your name')
+    member_list.append(Player(name))
+board = Board(member_list)
+random.shuffle(board.members)
+print(f'The order for rolling the dice has been decided. \n'
+      f'The games were to be played in the order of {str(board.members)[1:-1]}')
+for player in board.members:
+    player.throw_dice()
+    board.cell[player.position](player, board)
+    print(board.cell[player.position])
+    while player.zorome >= 1:
+        player.throw_dice()
+        print(board.cell[player.position])
+        if player.zorome == 3:  # ゾロ目連続3回で刑務所
+            player.zorome = 0
+            Gojail()
+        else:
+            board.cell[player.position](player, board)
 
 # %%
 # test
@@ -178,10 +324,10 @@ takeshun = Player('takeshun')
 board = Board([yusaku, takeshun])
 # land = Land('test', 200, 50)
 train1 = Train('train1', 'train')
-train2 = Train('train2','train')
+train2 = Train('train2', 'train')
 #%%
-# land.be_bought(yusaku, board)
-train1.be_bought(yusaku, board)
-train2.be_bought(yusaku, board)
-train1.charge_rental(takeshun)
-# %%
+# land(yusaku, board)
+# land(takeshun, board)
+train1(yusaku, board)
+train2(yusaku, board)
+train1(takeshun, board)
