@@ -111,7 +111,8 @@ class Land:
             self.auction(board)
 
     def auction(self, board: Board):
-            auction_price = None
+        auction_price = None
+        while True:
             print(
                 f'{self.name} is now for sale. Please include your user name and the amount you can offer\n'
             )
@@ -149,7 +150,7 @@ class Land:
                     self.owner.public_business.append(self)
                 self.is_own = True
                 self.owner.money -= auction_price
-                # break
+                break
 
     def cancel_mortgage(self):
         self.is_mortgage = False
