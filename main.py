@@ -166,7 +166,6 @@ class Land:
         user.money -= self.rental_price
         self.owner.money += self.rental_price
 
-
 class Player:
 
     def __init__(self, name: str):
@@ -177,16 +176,18 @@ class Player:
         self.public_business: list[Public] = []
         self.money: int = 1500
 
-
 class Street(Land):
     # TODO: Landと実装を合わせる
-    def __init__(self, color: str, name: str, price: int, kind:str) :
+    def __init__(self, color: str, name: str, price: int, rental_price=0,
+                 kind: str = 'building'):
         """
         color: 通りのカードの色
         name: 通りの名前
         price: 通りの値段
+        kind: buildingで固定。いじらなくていい
+        rental_price: 通行料。行列で内部的に制御するのでいじらなくてOK
         """
-        super().__init__(name, price, kind)
+        super().__init__(name, price, rental_price, kind)
         self.num_buildings = 0
         self.color = color
         self.name = name.lower()
@@ -207,20 +208,24 @@ class Street(Land):
 
 class Color():
 
-    def __init__(self,color:str, streets: Iterable[Street]):
+    def __init__(self, color: str, streets: Iterable[Street]):
         self.streets = streets
         self.color = color
 
     def can_buy_building(self, street_name: str):
         street_names = [street.name for street in self.streets]
-        if not street_name in street_names:
+        if street_name not in street_names:
             raise ValueError('不正なstreet名')
         owners = set(street.owner for street in self.streets)
         monopolied = (len(owners) == 1 and not None in owners)
         # その土地とほかの土地の建物数の差が1以下なら購入可能
         num_buildings = [street.num_buildings for street in self.streets]
-        is_valid_nums = (max(num_buildings) - min(num_buildings) <= 1)
-        can_buy = monopolied and is_valid_nums
+        for street in self.streets:
+            if street.name == street_name:
+                street_adding_building = street
+        diff_after_adding_building = street_adding_building.num_buildings + 1 - min(
+            num_buildings)
+        can_buy = monopolied and (diff_after_adding_building <= 1)
         return can_buy
 
 
@@ -257,7 +262,7 @@ class Train(Land):
 yusaku = Player('yusaku')
 takeshun = Player('takeshun')
 board = Board([yusaku, takeshun])
-street1 = Street('red', 'test1', 200, 50)
+street1 = Street('red', 'test2', 200, 50)
 street2 = Street('red', 'test2', 100, 25)
 
 street1.owner = yusaku
@@ -270,5 +275,3 @@ else:
 street2.owner = yusaku
 if color.can_buy_building('test1'):
     print('can_buy')
-
-# %%
