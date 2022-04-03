@@ -219,13 +219,17 @@ class Player:
         self.jailflag = False
 
     def throw_dice(self):
-        dice1 = random.randint(1, 6)
-        dice2 = random.randint(1, 6)
-        self.dice = dice1 + dice2
-        self.position += self.dice
+        if self.zorome == 3:
+            Jail()
+        else:
+            dice1 = random.randint(1, 6)
+            dice2 = random.randint(1, 6)
+            self.dice = dice1 + dice2
+            self.position += self.dice
 
         if dice1 == dice2:
             self.zorome += 1
+            self.throw_dice(self)
         else:
             self.zorome = 0
         print(self.dice)
@@ -296,9 +300,9 @@ class Jail:
 
     def __call__(self, player: Player):
         if player.jailflag:
-            self.no_jail()   # 普通にいくと素通り
-        else:
             self.jail_in(player) 
+        else:
+            self.no_jail()   # 普通にいくと素通り
 
     def no_jail():
         pass
