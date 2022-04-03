@@ -189,13 +189,13 @@ class Player:
 
 class Street(Land):
     # TODO: Landと実装を合わせる
-    def __init__(self, color: str, name: str, price: int, kind) :
+    def __init__(self, color: str, name: str, price: int, kind:str) :
         """
         color: 通りのカードの色
         name: 通りの名前
         price: 通りの値段
         """
-        super().__init__(name, price)
+        super().__init__(name, price, kind)
         self.num_buildings = 0
         self.color = color
         self.name = name.lower()
