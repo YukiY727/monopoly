@@ -242,19 +242,22 @@ class Street:
 
 
 class Train(Land):
-    pass
+    def __init__(self, name: str, kind: str):
+        super().__init__(name, 200, 50, kind)
+
+    def be_bought(self, player: Player, board: Board):
+        super().be_bought(player, board)
+        for owner_train in self.owner.train:
+            owner_train.change_rental()
+
+    def change_rental(self):
+        self.rental_price = 50 * len(self.owner.train)
 # %%
 class Public(Land):
 
     def __init__(self, name: str, price: int, kind: str):
         super().__init__(name, price, 0, kind)
         self.rental_ratio = 4
-
-    def __call__(self, player: Player, board: Board):
-        if self.owner:
-            self.pay_rental(player)
-        else:
-            self.be_bought(player, board)
 
     def be_bought(self, plyer: Player, board: Board):
         super().be_bought(plyer, board)
@@ -269,6 +272,17 @@ class Public(Land):
 
         user.money -= self.rental_price
         self.owner.money += self.rental_price
+
+class Chance:
+
+    def __init__(self):
+        pass
+
+
+class Pool:
+
+    def __init__(self):
+        pass
 
 # %%
 class Gojail:
@@ -316,25 +330,26 @@ class Jail:
 
 
 # %%
-# game
 num_player = int(input('Please enter the number of people playing'))
+assert 2 <= num_player <= 8, 'MONOPOLY is a game for 2-8 players.'
 member_list: list[Player] = []
 for i in range(num_player):
     print('Make PLAYER. Enter a name.')
     name = input('Input your name')
     member_list.append(Player(name))
 board = Board(member_list)
-random.shuffle(member_list)
-print(
-    f'The order for rolling the dice has been decided. \n'
-    f'The order to proceed with the game was decided by {" ".join(member_list)}'
-)
-for player in member_list:
+random.shuffle(board.members)
+print(f'The order for rolling the dice has been decided. \n'
+      f'The games were to be played in the order of {str(board.members)[1:-1]}')
+for player in board.members:
+    player.throw_dice()
+    board.cell[player.position](player, board)
+    print(board.cell[player.position])
     while player.zorome >= 1:
         player.throw_dice()
+        print(board.cell[player.position])
         if player.zorome == 3:  # ゾロ目連続3回で刑務所
             player.zorome = 0
-            player.jailflag = True
             Jail()
         else:
             board.cell[player.position](player, board)
