@@ -4,8 +4,6 @@ from __future__ import annotations
 from multiprocessing.connection import answer_challenge
 from random import random
 
-
-import random
 def query_yes_no(question, default="yes"):
     """質問(yes/no)の回答をBool値で出力
 
@@ -93,7 +91,6 @@ class Board:
             Street(),
         )
 
-
 class Go:
 
     def __init__(self):
@@ -102,18 +99,10 @@ class Go:
     def __call__(self, player: Player, board: Board):
         player.money += 200
 
-
 class Park:
 
     def __init__(self):
         self.name = 'Park'
-
-
-class Gojail:
-
-    def __init__(self) -> None:
-        pass
-
 
 class Incometax:
 
@@ -123,7 +112,6 @@ class Incometax:
     def __call__(self, player: Player, board: Board):
         player.money -= 200
 
-
 class Luxurytax:
 
     def __init__(self):
@@ -132,21 +120,6 @@ class Luxurytax:
     def __call__(self, player: Player, board: Board):
         player.money -= 100
 
-
-class Jail:
-
-    def __init__(self) -> None:
-        pass
-
-class Luxurytax:  # 税金
-    def __init__(self):
-        self.name = 'Luxury tax'
-
-    def __call__(self, player: Player, board: Board):
-        player.money -= 100
-
-
-# %%
 class Land:
 
     def __init__(self, name: str, price: int, rental_price: int, kind: str):
@@ -223,6 +196,7 @@ class Land:
         self.is_mortgage = False
         self.is_own = True
         self.owner.money -= round(self.price / 2 * 1.1)
+
     def put_in_mortgage(self):
         self.owner.money += self.price / 2
         self.is_own = False
@@ -238,8 +212,7 @@ class Player:
     def __init__(self, name: str):
         self.name = name
         self.train: list[Train] = []
-        self.buildings: list[Buildings] = [] # self.buildings: list[Street] = []
-        self.train: list[Train] = []
+        self.buildings: list[Street] = []
         self.public_business: list[Public] = []
         self.money: int = 1500
         self.dice = 0
@@ -276,6 +249,7 @@ class Public(Land):
 
     def __init__(self, name: str, price: int, kind: str):
         super().__init__(name, price, 0, kind)
+        self.rental_ratio = 4
 
     def __call__(self, player: Player, board: Board):
         if self.owner:
@@ -286,24 +260,14 @@ class Public(Land):
     def be_bought(self, plyer: Player, board: Board):
         super().be_bought(plyer, board)
 
-    def auction(self, board: Board):
-        super().be_bought(board)
-
-    def cancel_mortgage(self):
-        super().cancel_mortgage()
-        
-    def put_in_mortgage(self):
-        super().put_in_mortgage()
+        if len(self.owner.public_business) == 2:  # ElectricとWaterworksの所有者が同じ  
+            self.rental_ratio = 10
+        elif len(self.owner.public_business) == 1: # どちらか一つ所有
+            self.rental_ratio =  4
 
     def pay_rental(self, user: Player):
-        dice = user.dice
-        #if chance:
-        #    self.rental_price = dice * 10
-        #else:
-        if len(self.owner.public_business) == 2:  # ElectricとWaterworksの所有者が同じ  
-            self.rental_price = dice * 10
-        elif len(self.owner.public_business) == 1: # どちらか一つ所有
-            self.rental_price = dice * 4
+        self.rental_price = user.dice * self.rental_ratio
+
         user.money -= self.rental_price
         self.owner.money += self.rental_price
 
@@ -333,21 +297,23 @@ class Jail:
         if answer1: # カードの使用
             pass
             # 釈放
-        answer2 = query_yes_no(f'Would you pay $50 and exit the jail ?')
-        if answer2: # サイコロを振る前に50$払う
-            player.money -= 50
-            # 釈放
-        else: # diceを振る　# 3ターン以内にゾロ目を出す。出なかったら強制50$支払い
-            dice1 = random.randint(1, 6)
-            dice2 = random.randint(1, 6)
-            if dice1 == dice2:
-                pass
-                 #釈放　
-            else:
-                self.count += 1    
-        if self.count == 3:
-            player.money -= 50
-            # 釈放
+        else:
+            answer2 = query_yes_no(f'Would you pay $50 and exit the jail ?')
+            if answer2: # サイコロを振る前に50$払う
+                player.money -= 50
+                # 釈放
+            else: # diceを振る　# 3ターン以内にゾロ目を出す。出なかったら強制50$支払い
+                dice1 = random.randint(1, 6)
+                dice2 = random.randint(1, 6)
+                if dice1 == dice2:
+                    pass
+                    #釈放　
+                else:
+                    self.count += 1 
+
+                if self.count == 3:
+                    player.money -= 50
+                    # 釈放
 
 
 # %%
