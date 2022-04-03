@@ -4,7 +4,8 @@ from __future__ import annotations
 from multiprocessing.connection import answer_challenge
 from random import random
 
-# %%
+
+import random
 def query_yes_no(question, default="yes"):
     """質問(yes/no)の回答をBool値で出力
 
@@ -52,9 +53,10 @@ class Board:
             Go,
             Street(),
             Pool(),
-            Street(''),
+
+            Street(),
             Incometax(),
-            Train(),
+            Train('READING RAILROAD', 'train'),
             Street(),
             Chance(),
             Street(),
@@ -64,7 +66,7 @@ class Board:
             Public(),
             Street(),
             Street(),
-            Train(),
+            Train('PENNSYLVANIA RAILROAD', 'train'),
             Street(),
             Pool(),
             Street(),
@@ -74,7 +76,7 @@ class Board:
             Chance(),
             Street(),
             Street(),
-            Train(),
+            Train('B. & O. RAILROAD', 'train'),
             Street(),
             Street(),
             Public(),
@@ -84,47 +86,57 @@ class Board:
             Street(),
             Pool(),
             Street(),
-            Train(),
+            Train('SHORT', 'train'),
             Chance(),
             Street(),
             Luxurytax(),
             Street(),
         )
 
-# %%
-class Chance:
-    def __init__(self):
-        pass
 
-class Street:
-    def __init__(self):
-        pass
+class Go:
 
-class Pool:
-    def __init__(self):
-        pass
-
-class Train:
-    def __init__(self):
-        pass
-
-class Go: # スタート、ゴール
     def __init__(self):
         self.name = 'Go'
 
     def __call__(self, player: Player, board: Board):
         player.money += 200
 
+
 class Park:
+
     def __init__(self):
         self.name = 'Park'
 
-class Incometax:  # 税金
+
+class Gojail:
+
+    def __init__(self) -> None:
+        pass
+
+
+class Incometax:
+
     def __init__(self):
         self.name = 'Income tax'
 
     def __call__(self, player: Player, board: Board):
         player.money -= 200
+
+
+class Luxurytax:
+
+    def __init__(self):
+        self.name = 'Luxury tax'
+
+    def __call__(self, player: Player, board: Board):
+        player.money -= 100
+
+
+class Jail:
+
+    def __init__(self) -> None:
+        pass
 
 class Luxurytax:  # 税金
     def __init__(self):
@@ -152,7 +164,6 @@ class Land:
         else:
             self.be_bought(player, board)
 
-
     def be_bought(self, player: Player, board: Board):
         answer = query_yes_no(f'Would you buy this land for {self.price} ?')
         if answer:
@@ -161,7 +172,7 @@ class Land:
             elif self.kind == 'train':
                 player.train.append(self)
             elif self.kind == 'public_business':
-                player.public_business.append(self)
+                player.public_business.append(self) # player.train.append(self)
             self.owner = player
             player.money -= self.price
         else:
@@ -212,7 +223,6 @@ class Land:
         self.is_mortgage = False
         self.is_own = True
         self.owner.money -= round(self.price / 2 * 1.1)
-        
     def put_in_mortgage(self):
         self.owner.money += self.price / 2
         self.is_own = False
@@ -228,7 +238,8 @@ class Player:
     def __init__(self, name: str):
         self.name = name
         self.train: list[Train] = []
-        self.buildings: list[Street] = []
+        self.buildings: list[Buildings] = [] # self.buildings: list[Street] = []
+        self.train: list[Train] = []
         self.public_business: list[Public] = []
         self.money: int = 1500
         self.dice = 0
@@ -246,7 +257,19 @@ class Player:
             self.zorome += 1
         else:
             self.zorome = 0
+        print(self.dice)
 
+    def __repr__(self) -> str:
+        return self.name
+
+
+class Street:
+
+    def __init__(self):
+        pass
+
+
+class Train(Land):
 
 # %%
 class Public(Land):
@@ -356,11 +379,12 @@ for player in member_list:
 yusaku = Player('yusaku')
 takeshun = Player('takeshun')
 board = Board([yusaku, takeshun])
-
-water = Public('test1', 200, 'public_business')
-elect = Public('test2', 200, 'public_business')
-
-water.be_bought(yusaku, board)
-elect.be_bought(yusaku, board)
-
-water.pay_rental(takeshun)
+# land = Land('test', 200, 50)
+train1 = Train('train1', 'train')
+train2 = Train('train2', 'train')
+#%%
+# land(yusaku, board)
+# land(takeshun, board)
+train1(yusaku, board)
+train2(yusaku, board)
+train1(takeshun, board)
