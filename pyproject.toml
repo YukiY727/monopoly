@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "monopoly"
+version = "0.1.0"
+description = ""
+authors = ["YukiY727 <y.yamada@4nonome.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+
+[tool.poetry.group.ci.dependencies]
+ruff = "^0.1.14"
+tox = "^4.12.1"
+pre-commit = "^3.6.0"
+isort = "^5.13.2"
+mypy = "^1.8.0"
+black = "^24.1.0"
+flake8 = "^7.0.0"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+
+[tool.ruff.lint]
+select = ["ALL"]
+fixable = ["ALL"]
+unfixable = ["F401"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
